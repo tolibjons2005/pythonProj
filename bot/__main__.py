@@ -4,7 +4,7 @@ import asyncio
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommand
-from aioredis import Redis
+# from aioredis import Redis
 from sqlalchemy.engine import URL
 from dotenv import load_dotenv
 
@@ -24,7 +24,7 @@ async def main() -> None:
     for cmd in bot_commands:
         commands_for_bot.append(BotCommand(command=cmd[0], description=cmd[1]))
 
-    redis = Redis()
+    # redis = Redis()
 
 
 
