@@ -42,14 +42,14 @@ async def main() -> None:
     register_user_commands(dp)
 
     postgres_url = URL.create(
-        'postgresql+asyncpg',
-        username=os.getenv('db_user'),
-        password=os.getenv('db_pass'),
-        host='localhost',
-        database=os.getenv('db_name'),
-        port=os.getenv('db_port')
+            'postgresql+asyncpg',
+            username=os.getenv('db_user'),
+            password=os.getenv('db_pass'),
+            host='containers-us-west-41.railway.app',
+            database=os.getenv('db_name'),
+            port=os.getenv('db_port')
 
-    )
+        )
 
     async_engine = create_async_engine(postgres_url)
     session_maker = get_session_maker(async_engine)

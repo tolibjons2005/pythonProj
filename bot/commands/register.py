@@ -281,7 +281,7 @@ async def registered_menu(message: types.Message, state: FSMContext, session_mak
     except (ValueError):
         await create_user(students_id[0], message.from_user.id, students_name[0], t_name, t_subject, sch_name,subject_1, subject_2, district, region, group_name,session_maker)
 
-    await message.answer(f'Fayl jo\'nat', reply_markup=end_register)
+    await message.answer(f'Ro\'yxatdan o\'tishni yakunlandi', reply_markup=end_register)
     await state.set_state(Registration.end)
 
 #
