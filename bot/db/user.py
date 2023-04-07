@@ -45,7 +45,7 @@ class User(BaseModel):
         return f"Users:{self.student_id}>"
 
 
-async def get_st_ids(user_id: int, session_maker: sessionmaker) -> User.student_id:
+async def get_st_ids(user_id: int,group_name:str, session_maker: sessionmaker) -> User.student_id:
     """
     Получить пользователя по его id
     :param user_id:
@@ -56,11 +56,27 @@ async def get_st_ids(user_id: int, session_maker: sessionmaker) -> User.student_
         async with session.begin():
             result = await session.execute(
                 select(User).options(load_only(User.student_id, User.st_fullname))
+                    .filter(User.teacher_id == user_id, User.group_name==group_name)  # type: ignore
+            )
+            return result.scalars().all()
+
+async def get_group_names(user_id: int, session_maker: sessionmaker) -> User.student_id:
+    """
+    Получить пользователя по его id
+    :param user_id:
+    :param session_maker:
+    :return:
+    """
+    async with session_maker() as session:
+        async with session.begin():
+            result = await session.execute(
+                select(User.group_name).distinct()
                     .filter(User.teacher_id == user_id)  # type: ignore
             )
             return result.scalars().all()
 
-async def get_st_datas(user_id: int, session_maker: sessionmaker) -> User.student_id:
+
+async def get_st_datas(user_id: int,group_name:str, session_maker: sessionmaker) -> User.student_id:
     """
     Получить пользователя по его id
     :param user_id:
@@ -71,8 +87,8 @@ async def get_st_datas(user_id: int, session_maker: sessionmaker) -> User.studen
     async with session_maker() as session:
         async with session.begin():
             result = await session.execute(
-                select(User).options(load_only(User.school_name, User.subject_1, User.subject_2, User.group_name))
-                    .filter(User.teacher_id == user_id)  # type: ignore
+                select(User).options(load_only(User.school_name, User.subject_1, User.subject_2))
+                    .filter(User.teacher_id == user_id, User.group_name==group_name)  # type: ignore
             )
             return result.scalars().first()
 

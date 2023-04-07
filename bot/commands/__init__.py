@@ -1,6 +1,6 @@
 __all__ = ['register_user_commands', 'bot_commands']
 
-from bot.middlewares.register_check import RegisterCheck
+# from bot.middlewares.register_check import RegisterCheck
 from aiogram import Router
 from aiogram.filters.command import CommandStart
 from bot.commands.start import start
@@ -9,7 +9,7 @@ from bot.commands.settings import settings_command, settings_callback
 from bot.commands.register import send_file, register_group_name, detect_subject, select_subject, \
     tutorial, register_t_name, registered_menu, register_school_name, register_subject, register_students, \
     about_register_students, register_back, get_file, scan_test, register_region, register_district, callback_back, \
-    reg_menu, about_scan_test
+    reg_menu, about_scan_test, select_group_name
 from aiogram import F
 from bot.commands.callback_data_states import TestCallbackData
 from bot.fsm import Registration, PostRegistration
@@ -20,11 +20,13 @@ bot_commands = (('start', 'Start  starts', 'Start  starts bot'),
 
 def register_user_commands(router: Router) -> None:
     # router.message.register(show_user)
+
     router.message.register(reg_menu, CommandStart(),PostRegistration.menu)
     router.message.register(reg_menu, CommandStart(), PostRegistration.scan_test)
     router.message.register(reg_menu, CommandStart(), PostRegistration.send_file)
-    router.message.register(send_file,F.text=='Test yaratish', PostRegistration.menu)
+    router.message.register(select_group_name,F.text=='Test yaratish', PostRegistration.menu)
     router.message.register(about_scan_test, F.text=='Natijalarni tekshirish', PostRegistration.menu)
+    router.callback_query.register(send_file, F.data.startswith('gr_'))
 
 
     router.message.register(register_subject,F.text == 'Ortga qaytish', Registration.register_group_name)

@@ -55,14 +55,18 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
         # context['block1'] = get_string(output_file, test_type)
         # delay= '3000'
     else:
+        rown = False
+        rown2 = False
         if second_sub in ['Kimyo']:
             row_2 = 1
+            rown = True
         else:
             row_2=2
 
 
         if third_sub in ['Kimyo']:
             row_3=1
+            rown2 = True
         else:
             row_3=2
 
@@ -72,7 +76,7 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
 
 
         for k in ids:
-            text,answ = get_string(text1, test_type)
+            text,answ = get_string(text1, test_type, second_sub, third_sub, rown, rown2 )
             i += 1
             id = k.student_id
             name = k.st_fullname
@@ -87,6 +91,7 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
 			function buildNewsletterrr5{i}(){{
 			$cover= $('#cover1').clone()
 			$cover.find(".id_classs").append("{id}")
+			$cover.find(".namn").append("{name}")
 			$("body").append($cover.css("display", "block"));
 			
 			}}setTimeout(buildNewsletterrr5{i}, 100);
@@ -222,7 +227,7 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
 			for(var i = 0; i < (4-((page-1)%4)); i++){{
 			
 			 $blank_page=$("#blankkk").clone().css("display", "block");
-            $blank_page.append(page);
+
             $('body').append($blank_page);
             }}
 									}}

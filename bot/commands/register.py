@@ -1,6 +1,7 @@
 from aiogram import types
 from aiogram.filters import CommandObject
 from aiogram.fsm.context import FSMContext
+from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from sqlalchemy import select  # type: ignore
 from sqlalchemy.orm import sessionmaker, joinedload, selectinload  # type: ignore
 from bot.fsm import Registration, PostRegistration
@@ -16,7 +17,7 @@ from io import BytesIO
 from aiogram import Bot
 
 
-from bot.db.user import create_user, get_st_ids, get_st_datas, add_answers
+from bot.db.user import create_user, get_st_ids, get_st_datas, add_answers, get_group_names
 from bot.pdftool.utils import create_pdf
 
 
@@ -286,11 +287,13 @@ async def registered_menu(message: types.Message, state: FSMContext, session_mak
 
 #
 async def reg_menu(message: types.Message, state: FSMContext):
-    await message.answer(f'Fayl jo\'nat', reply_markup=menu)
+    await message.answer(f'Kerakli bo\'limni tanlang', reply_markup=menu)
     await state.clear()
     await state.set_state(PostRegistration.menu)
 
 async def get_file(message: types.Message, state: FSMContext, bot: Bot, session_maker: sessionmaker):
+    user_data = await state.get_data()
+    groupn = user_data['groupn']
     save_to_io = BytesIO()
     save_to_pdf = BytesIO()
     save_to_title_pdf = BytesIO()
@@ -298,9 +301,9 @@ async def get_file(message: types.Message, state: FSMContext, bot: Bot, session_
         message.document,
         destination=save_to_io
     )
-    ids = await get_st_ids(int(message.from_user.id), session_maker)
-    datas = await get_st_datas(int(message.from_user.id), session_maker)
-    save_to_title_pdf=create_title(ids, message.from_user.id, datas.school_name, '20.03.2023', datas.group_name,
+    ids = await get_st_ids(int(message.from_user.id),groupn, session_maker)
+    datas = await get_st_datas(int(message.from_user.id), groupn,session_maker)
+    save_to_title_pdf=create_title(ids, message.from_user.id, datas.school_name, '20.03.2023', groupn,
                  datas.subject_1, datas.subject_2)
     document = types.input_file.BufferedInputFile(file=save_to_title_pdf, filename='document.pdf')
     await bot.send_document(message.chat.id, document=document)
@@ -327,10 +330,20 @@ async def scan_test(message: types.Message, state: FSMContext, bot: Bot,session_
     grading, resultg = await test_scanner_func(photo_io,session_maker)
     await message.answer(str(resultg))
 
+async def select_group_name(message: types.Message, state: FSMContext,session_maker: sessionmaker):
+    builder = InlineKeyboardBuilder()
+    group_names = await get_group_names(int(message.from_user.id), session_maker)
+    for i in group_names:
+        builder.add(types.InlineKeyboardButton(text=i, callback_data=f'gr_{i}'))
+    builder.adjust(1)
 
-async def send_file(message: types.Message, state: FSMContext, bot: Bot):
-    await message.answer("Fayl jo'nating", reply_markup=back_2_menu)
+    await message.answer("Test yaratish uchun guruhni tanlang:",reply_markup=builder.as_markup())
+
+
+async def send_file(call: types.CallbackQuery, state: FSMContext, bot: Bot):
+    await call.message.answer("Fayl jo'nating", reply_markup=back_2_menu)
     await state.set_state(PostRegistration.send_file)
+    await state.update_data(groupn=call.data[3:])
 
 
 async def callback_back(call: types.CallbackQuery, state: FSMContext):

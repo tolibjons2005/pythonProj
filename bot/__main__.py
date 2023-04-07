@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 
 
-from bot.middlewares.register_check import RegisterCheck
+from bot.middlewares.register_check import ThrottlingMiddleware
 from commands import register_user_commands, bot_commands
 from db import BaseModel, create_async_engine, get_session_maker, proceed_schemas
 
@@ -31,8 +31,9 @@ async def main() -> None:
     storage = MemoryStorage()
     dp =Dispatcher(storage=storage)
     bot = Bot(token=os.getenv('token'))
+    dp.message.middleware(ThrottlingMiddleware())
 
-    # dp.message.middleware(RegisterCheck())
+
     # dp.callback_query.middleware(RegisterCheck())
 
     # bot = Bot(token=os.getenv('token'))
@@ -45,7 +46,7 @@ async def main() -> None:
             'postgresql+asyncpg',
             username=os.getenv('db_user'),
             password=os.getenv('db_pass'),
-            host='containers-us-west-41.railway.app',
+            host='localhost',
             database=os.getenv('db_name'),
             port=os.getenv('db_port')
 
@@ -60,6 +61,7 @@ async def main() -> None:
 
 if __name__ == '__main__':
     try:
+
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         print('Bot stopped')

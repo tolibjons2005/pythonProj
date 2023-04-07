@@ -1,3 +1,17 @@
-grading ='101111111111111111111111111111111111111110111111111111111111111111111111111111111111111111'
-resultg=(grading[:30].count('1')*1.1+grading[30:60].count('1')*3.1+grading[60:90].count('1')*2.1)
-print(resultg)
+# import time
+# import psutil
+#
+# def display_usage(cpu_usage, mem_usage, bars=50):
+#     cpu_percent = (cpu_usage/100.0)
+#     cpu_bar="█" * int(cpu_percent*bars) + "-" * (bars-int(cpu_percent*bars))
+#
+#     mem_percent = (mem_usage/100.0)
+#     mem_bar="█" * int(mem_percent*bars) + "-" * (bars-int(mem_percent*bars))
+#
+#     print(f"\rCPU Usage: |{cpu_bar}| {cpu_usage:.2f}% ", end="")
+#     print(f"MEM Usage: |{mem_bar}| {mem_usage:.2f}% ", end="\r")
+# display_usage(psutil.cpu_percent(), psutil.virtual_memory().percent, 30)
+# n=0
+# while n<10:
+#     display_usage(psutil.cpu_percent(), psutil.virtual_memory().percent, 30)
+#     time.sleep(1)
