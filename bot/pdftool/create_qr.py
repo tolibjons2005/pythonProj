@@ -1,5 +1,9 @@
 import qrcode
 import os
+
+from db.user import get_n_test
+
+
 # import qrcode.image.svg
 def create_directory(name):
     directory = f"id{name}"
@@ -17,14 +21,19 @@ def create_directory(name):
     except FileExistsError:
     # directory already exists
         pass
-def create_qr_f(id, name):
-
+def create_qr_f(id, name, n, test_type):
 
     # Leaf directory
+    if test_type == '90':
+        n=n[0]
+    if test_type == '30':
+        n=n[1]
+
 
     qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=15, border=0)
+    idn=test_type+ str(id)+n
 
-    qr.add_data(id)
+    qr.add_data(idn)
     qr.make(fit=True)
 
     img = qr.make_image(fill_color='black', back_color='white')

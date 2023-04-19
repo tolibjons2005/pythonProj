@@ -93,13 +93,13 @@ def reorder(myPoints):
 #
 #     return boxes
 
-def splitBoxes(img):
+def splitBoxes(img, question):
     collums = np.hsplit(img,3)
     boxes = []
     for c in collums:
-        rows = np.vsplit(c,32)
+        rows = np.vsplit(c,question+2)
         del rows[0]
-        del rows[30]
+        del rows[question]
         for r in rows:
             choices = np.hsplit(r,8)
             del choices[0]

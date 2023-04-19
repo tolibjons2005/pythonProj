@@ -6,7 +6,7 @@ def get_str(tid, file):
     print(type(doc))
     text = doc.get_text(image_dir=f'img/id{tid}', lltid=tid)
     return text
-def get_string(text, test_type, second_sub, third_sub, rown, rown2):
+def get_string(text, test_type, second_sub, third_sub, rown=False, rown2=False, t_sub=''):
     print(text)
 
 
@@ -259,6 +259,7 @@ def get_string(text, test_type, second_sub, third_sub, rown, rown2):
                 text2[1] += "</p>"
                 text2[1] += "</br></br>"
         else:
+
             for i in l[3]:
                 s = i - 30
                 n += 1
@@ -460,6 +461,7 @@ def get_string(text, test_type, second_sub, third_sub, rown, rown2):
         chl = [" A)", " B)", " C)", " D)"]
         ans = ''
         text2 = ''
+        text2 += f'<h4>{t_sub}</h4>'
         for i in l:
             n += 1
             random.shuffle(y)
@@ -471,19 +473,54 @@ def get_string(text, test_type, second_sub, third_sub, rown, rown2):
             print(r1[i].replace('#', str(n) + '.', 1))
             text2 += r1[i].replace('#', '<span style=" font-weight:500;">' + str(n) + '.</span>', 1)
             text2 += "</br>"
-            for j in y:
-                result = re.match(pattern, chooses[i][j])
-                if result:
-                    print(chl[ch], chooses[i][j][3:])
-                    # text2 += '</br>'+chl[ch]+chooses[i][j][3:]
-                    text2 += chl[ch] + chooses[i][j][3:]
-                    ans+=str((ch + 1))
-                else:
-                    print(chl[ch], chooses[i][j][2:])
-                    # text2 += '</br>'+chl[ch]+chooses[i][j][2:]
-                    text2 += chl[ch] + chooses[i][j][2:]
+            if len(chooses[i][0]) < 15:
+                for j in y:
+                    result = re.match(pattern, chooses[i][j])
+                    if result:
+                        print(chl[ch], chooses[i][j][3:])
+                        # text2 += '</br>'+chl[ch]+chooses[i][j][3:]
+                        text2 += ' ' + chl[ch] + chooses[i][j][3:]
+                        ans += str((ch + 1))
+                    else:
+                        print(chl[ch], chooses[i][j][2:])
+                        # text2 += '</br>'+chl[ch]+chooses[i][j][2:]
+                        text2 += ' ' + chl[ch] + chooses[i][j][2:]
 
-                ch += 1
+                    ch += 1
+            elif len(chooses[i][0]) > 14 and len(chooses[i][0]) < 24:
+                for j in y:
+                    result = re.match(pattern, chooses[i][j])
+                    if ch == 2:
+                        text2 += '</br>'
+                    if result:
+                        print(chl[ch], chooses[i][j][3:])
+                        # text2 += '</br>'+chl[ch]+chooses[i][j][3:]
+                        text2 += ' ' + chl[ch] + chooses[i][j][3:]
+                        ans += str((ch + 1))
+
+                    else:
+                        print(chl[ch], chooses[i][j][2:])
+                        # text2 += '</br>'+chl[ch]+chooses[i][j][2:]
+                        text2 += ' ' + chl[ch] + chooses[i][j][2:]
+
+                    ch += 1
+
+            else:
+                for j in y:
+                    result = re.match(pattern, chooses[i][j])
+
+                    if result:
+                        print(chl[ch], chooses[i][j][3:])
+                        # text2 += '</br>'+chl[ch]+chooses[i][j][3:]
+                        text2 += ' ' + chl[ch] + chooses[i][j][3:] + '</br>'
+                        ans += str((ch + 1))
+
+                    else:
+                        print(chl[ch], chooses[i][j][2:])
+                        # text2 += '</br>'+chl[ch]+chooses[i][j][2:]
+                        text2 += ' ' + chl[ch] + chooses[i][j][2:] + '</br>'
+
+                    ch += 1
             print("\n")
             text2 += "</p>"
             text2 += "</br></br>"

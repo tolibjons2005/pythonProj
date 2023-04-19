@@ -4,8 +4,8 @@ import shutil
 import pdfkit
 import jinja2
 
-from bot.db.user import add_answers
-from bot.pdftool.docx2string import get_string, get_str
+from db.user import add_answers
+from pdftool.docx2string import get_string, get_str
 import time
 import asyncio
 start_time = time.time()
@@ -35,7 +35,7 @@ template_env=jinja2.Environment(loader=template_loader)
 
 
 
-async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids, date, tid, session_maker):
+async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids, date, tid, session_maker, t_sub):
     parent_dir = "D:/pythonProject/bot/img"
     directory = f"id{tid}"
 
@@ -48,12 +48,80 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
     tests =''
     save_to_io = BytesIO()
     if test_type == '30':
-        pass
+        for k in ids:
+            text, answ = get_string(text1, test_type, second_sub, third_sub, t_sub)
+            i += 1
+            id = k.student_id
+            name = k.st_fullname
+            await add_answers(k.student_id,tid, answ, test_type, session_maker)
+            template = template_env.get_template('./pdftool/template/template30.html')
 
+            func_string+=f"""
+            $(function(){{
+			var content_height = 1048;	// the height of the content, discluding the header/footer
+			var page = 2;
+			
+
+			
+           function buildNewsletter1{i}(){{
+           
+				if($('#newsletterContent1{i}').contents().length > 0 ){{
+					// when we need to add a new page, use a jq object for a template
+					// or use a long HTML string, whatever your preference
+					$page = $("#page_template").clone().addClass("page").css("display", "block");
+
+					// fun stuff, like adding page numbers to the footer
+					$page.find(".footer span").append(page);
+					$page.find(".header .name_class").append("{name}");
+					$page.find(".header .id_class").append("{id}");
+					page++;
+					$("body").append($page);
+					
+					
+
+					// here is the columnizer magic
+					$('#newsletterContent1{i}').columnize({{
+						columns:2,
+
+						target: ".page:last .content",
+						overflow: {{
+							height: content_height,
+							id: "#newsletterContent1{i}",
+							doneFunc: function(){{
+								console.log(page);
+
+								buildNewsletter1{i}();}}
+
+
+
+						}}
+					}});
+
+
+
+
+				}}
+			}}
+			setTimeout(buildNewsletter1{i}, 200);
+
+			
+			}});
+            
+
+"""
+            tests += f"""
+            <div id="newsletterContent1{i}">{text}</div>
+            
+"""
+        context['functions'] = func_string
+        context['tests'] = tests
+        context['name_s'] = name_s
+
+        context['date'] = date
 
         # template = template_env.get_template('./pdftool/template/templatecopy.html')
         # context['block1'] = get_string(output_file, test_type)
-        # delay= '3000'
+        delay= '5000'
     else:
         rown = False
         rown2 = False
@@ -80,7 +148,8 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
             i += 1
             id = k.student_id
             name = k.st_fullname
-            await add_answers(k.student_id,answ, session_maker)
+            await add_answers(k.student_id,tid,answ, test_type, session_maker)
+
 
 
             func_string += f"""

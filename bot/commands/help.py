@@ -3,7 +3,7 @@ from aiogram.filters import CommandObject
 from aiogram.fsm.context import FSMContext
 from sqlalchemy import select  # type: ignore
 from sqlalchemy.orm import sessionmaker, joinedload, selectinload  # type: ignore
-from bot.fsm import Registration
+from fsm import Registration
 # from bot.db.user import get_user, create_user
 
 

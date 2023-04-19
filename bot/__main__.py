@@ -1,6 +1,8 @@
 import logging
 import os
 import asyncio
+import pstats
+
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommand
@@ -10,7 +12,7 @@ from dotenv import load_dotenv
 
 
 
-from bot.middlewares.register_check import ThrottlingMiddleware
+# from bot.middlewares.register_check import ThrottlingMiddleware
 from commands import register_user_commands, bot_commands
 from db import BaseModel, create_async_engine, get_session_maker, proceed_schemas
 
@@ -25,13 +27,14 @@ async def main() -> None:
         commands_for_bot.append(BotCommand(command=cmd[0], description=cmd[1]))
 
     # redis = Redis()
+    # redis
 
 
 
     storage = MemoryStorage()
     dp =Dispatcher(storage=storage)
     bot = Bot(token=os.getenv('token'))
-    dp.message.middleware(ThrottlingMiddleware())
+    # dp.message.middleware(ThrottlingMiddleware())
 
 
     # dp.callback_query.middleware(RegisterCheck())

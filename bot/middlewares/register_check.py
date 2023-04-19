@@ -1,9 +1,9 @@
-from sqlalchemy import select
-from typing import Callable, Dict, Any, Awaitable, Union
-from aiogram import BaseMiddleware
-from aiogram.types import Message, CallbackQuery
-from sqlalchemy.orm import sessionmaker
-from bot.db import User
+# from sqlalchemy import select
+# from typing import Callable, Dict, Any, Awaitable, Union
+# from aiogram import BaseMiddleware
+# from aiogram.types import Message, CallbackQuery
+# from sqlalchemy.orm import sessionmaker
+# from db import User
 
 # class RegisterCheck(BaseMiddleware):
 #

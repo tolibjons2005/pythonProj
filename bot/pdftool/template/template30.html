@@ -10,15 +10,16 @@
 .page{ width: 840px; height: 1188px;   position: relative; }
 .page .content .column{ text-align:left; font-size: 10pt; font-family: myFirstFont; }
 .page .content .column blockquote{ border-left: 2px solid #999999; background: #DEDEDE; padding: 10px; margin: 4px 20px; clear: both; }
-.page .content .column img{ float: left; margin: 10px; }
+
 .page .content .column p{ padding: 0 10px; margin: 0px 10px;}
 .page .content .column h1{ padding: 0 10px; }
 .page .header{ text-align: center; font-size: 16px; font-family: helvetica, arial; padding: 20px 0 0 ; }
-.page .header hr, .page .footer hr{ width: 760px; }
+.page .header hr, .page .footer hr{ width: 760px;     border-style: solid; border-width:1px;}
 .page .footer{ text-align: center; position: absolute; bottom: 20px; left:40px;  font-size: 16px; font-family: helvetica, arial;  }
 .page .footer span{ }
 #page_template{ display: none; }
 #test1{display:none;}
+
 
 .enclosure {border:1px dashed red}
 </style>
@@ -202,46 +203,11 @@ $inBox.append($("<br style='clear:both;'>"));}
 $inBox.find('.column').find(':first.removeiffirst').remove();$inBox.find('.column').find(':last.removeiflast').remove();$inBox.data("columnizing",false);if(options.overflow){options.overflow.doneFunc();}
 options.doneFunc();}});};})(jQuery);</script>
 	<script>
-		$(function(){
-			var content_height = 1048;	// the height of the content, discluding the header/footer
-			var page = 2;				// the beginning page number to show in the footer
-			function buildNewsletter(){
-				if($('#newsletterContent').contents().length > 0 ){
-					// when we need to add a new page, use a jq object for a template
-					// or use a long HTML string, whatever your preference
-					$page = $("#page_template").clone().addClass("page").css("display", "block");
-
-					// fun stuff, like adding page numbers to the footer
-					$page.find(".footer span").append(page);
-					$("body").append($page);
-					page++;
-
-					// here is the columnizer magic
-					$('#newsletterContent').columnize({
-						columns:2,
-
-						target: ".page:last .content",
-						overflow: {
-							height: content_height,
-							id: "#newsletterContent",
-							doneFunc: function(){
-								console.log("done with page");
-								buildNewsletter();
-							}
-						}
-					});
 
 
+		{{ functions }}
 
 
-				}
-			}
-			setTimeout(buildNewsletter, 200);
-
-
-
-
-		});
 	</script>
 	 <script type="text/x-mathjax-config">
 		MathJax.Hub.Config({
@@ -270,24 +236,26 @@ options.doneFunc();}});};})(jQuery);</script>
 <div id="page_template">
 	<div class='header'><table style="width:100%; padding-bottom:5px; font-family:bitter; font-style:italic; font-size: 16px; line-height: 19px; letter-spacing: 0.02em;">
 		<tr>
-		  <td style="text-align:left; padding-left:40px;width:254px;">{{ name }}</td>
+		  <td class='name_class' style="text-align:left; padding-left:40px;width:254px;"></td>
 		  <td style="text-align:center">{{ name_s }}</td>
-		  <td style="text-align:right; padding-right: 40px;width:254px;">{{ id }}</td>
+		  <td class='id_class' style="text-align:right; padding-right: 40px;width:254px;"></td>
 		</tr>
 	  </table><hr></div>
 	<div class='content'></div>
 	<div class='footer'><hr><table style="width:100%; padding-top:5px; font-family:bitter; font-style:italic; font-size: 16px; line-height: 19px; letter-spacing: 0.02em;" >
 		<tr>
-		  <td style="text-align:left; padding-left:40px; width:254px;">@card_test_centre_bot</td>
+		  <td style="text-align:left;  width:254px;">@card_test_centre_bot</td>
 		  <td style="text-align:center"><span></span></td>
-		  <td style="text-align:right; padding-right: 40px; width:254px;">{{ date }}</td>
+		  <td style="text-align:right; padding-right: 0; width:254px;">{{ date }}</td>
 		</tr>
 	  </table></div>
 </div>
 
-<div id="newsletterContent">{{ block1 }}</div>
 
 
+
+
+{{ tests }}
 
 </body>
 </html>

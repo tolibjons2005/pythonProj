@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.utils.keyboard import (InlineKeyboardBuilder)
 
-from bot.commands.callback_data_states import TestCallbackData
+from commands.callback_data_states import TestCallbackData
 
 
 async def settings_command(message: types.Message):

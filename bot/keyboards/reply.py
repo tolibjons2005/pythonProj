@@ -18,23 +18,52 @@ yes =ReplyKeyboardMarkup(
 ], resize_keyboard=True )
 back = ReplyKeyboardMarkup(
     keyboard=[
-    [KeyboardButton(text="Ortga qaytish")]
+    [KeyboardButton(text="Ortga qaytish🔙")]
 ], resize_keyboard=True )
 #
 back_2_menu = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text="Asosiy menyuga qaytish")]
+    [KeyboardButton(text="Asosiy menyuga qaytish🔙")]
 ], resize_keyboard=True )
 end_register = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text="Ro‘yxatdan o‘tishni yakunlash")],
-[KeyboardButton(text="Ortga qaytish")]
+[KeyboardButton(text="Ortga qaytish🔙")]
 ], resize_keyboard=True )
-menu = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Test yaratish"),KeyboardButton(text="Natijalarni tekshirish")], [KeyboardButton(text="Ma'lumotlarni tahrirlash")]], resize_keyboard=True)
+menu = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Test yaratish📝"),KeyboardButton(text="Natijalarni tekshirish✅❌")], [KeyboardButton(text="Ma'lumotlarni tahrirlash✏️")], [KeyboardButton(text="Statistika📊")]], resize_keyboard=True)
 end = ReplyKeyboardMarkup(
     keyboard=[
     [KeyboardButton(text="Qo'shishni yakunlash")],
 
-    [KeyboardButton(text="Ortga qaytish")]
+    [KeyboardButton(text="Ortga qaytish🔙")]
 ], resize_keyboard=True )
+
+edit_menu = ReplyKeyboardMarkup(
+    keyboard=[
+    [KeyboardButton(text="O'quvchi qo'shish")],
+
+[KeyboardButton(text="Yangi guruh qo'shish")],
+
+
+    [KeyboardButton(text="Asosiy menyuga qaytish🔙")],
+
+], resize_keyboard=True )
+slct_role = ReplyKeyboardMarkup(
+    keyboard=[
+    [KeyboardButton(text="O‘qituvchi")],
+
+
+    [KeyboardButton(text="O‘quvchi")],
+[KeyboardButton(text="Ortga qaytish🔙")]
+], resize_keyboard=True )
+student_key = ReplyKeyboardMarkup(
+    keyboard=[
+    [KeyboardButton(text="Ohirgi natijani ko‘rish")],
+
+
+
+[KeyboardButton(text="Ortga qaytish🔙")]
+], resize_keyboard=True )
+test_type = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='90 talik (blok)', callback_data="test_type_90")],[InlineKeyboardButton(text='30 talik', callback_data="test_type_30")]])
+
 
 buttons = [
     [InlineKeyboardButton(text="Biologiya", callback_data="data_Biologiya"),
@@ -49,7 +78,7 @@ buttons = [
     InlineKeyboardButton(text="Geografiya", callback_data="data_Geografiya")],
     [InlineKeyboardButton(text="Qoraqalpoq tili va adabiyoti", callback_data="data_Qoraqalpoq_tili_va_adabiyoti"),
     InlineKeyboardButton(text="Matematika", callback_data="data_Matematika")],
-    [InlineKeyboardButton(text="Ortga qaytish", callback_data="subject_back")]
+    [InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="subject_back")]
 
     ]
 
@@ -71,7 +100,7 @@ InlineKeyboardButton(text="To‘rtko‘l tumani", callback_data="district_To‘r
 InlineKeyboardButton(text="Chimboy tumani", callback_data="district_Chimboy tumani")],
 [InlineKeyboardButton(text="Sho‘manoy tumani", callback_data="district_Sho‘manoy tumani"),
 InlineKeyboardButton(text="Ellikqal’a tuman", callback_data="district_Ellikqal’a tuman")],
-[InlineKeyboardButton(text="Ortga qaytish", callback_data="district_back")]
+[InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="district_back")]
 ]
 
 k_karakalpak = InlineKeyboardMarkup(inline_keyboard=karakalpak)
@@ -94,7 +123,7 @@ InlineKeyboardButton(text="Oltinko‘l tumani", callback_data="district_Oltinko�
 InlineKeyboardButton(text="Ulug‘nor tumani", callback_data="district_Ulug‘nor tumani")],
 [InlineKeyboardButton(text="Xo‘jaobod tumani", callback_data="district_Xo‘jaobod tumani"),
 InlineKeyboardButton(text="Shahrixon tuman", callback_data="district_Shahrixon tuman")],
-[InlineKeyboardButton(text="Ortga qaytish", callback_data="district_back")]
+[InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="district_back")]
 ]
 
 k_andijon=InlineKeyboardMarkup(inline_keyboard=andijon)
@@ -113,7 +142,7 @@ InlineKeyboardButton(text="Shofirkon tumani", callback_data="district_Shofirkon 
 [InlineKeyboardButton(text="Qorovulbozor tumani", callback_data="district_Qorovulbozor tumani"),
 InlineKeyboardButton(text="Qorako‘l tumani", callback_data="district_Qorako‘l tumani")],
 [InlineKeyboardButton(text="G‘ijduvon tuman", callback_data="district_G‘ijduvon tuman")],
-[InlineKeyboardButton(text="Ortga qaytish", callback_data="district_back")]
+[InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="district_back")]
 ]
 
 k_bukhara = InlineKeyboardMarkup(inline_keyboard=bukhara)
@@ -132,7 +161,7 @@ InlineKeyboardButton(text="Forish tumani", callback_data="district_Forish tumani
 [InlineKeyboardButton(text="Sharof Rashidov tumani", callback_data="district_Sharof Rashidov tumani"),
 InlineKeyboardButton(text="G‘allaorol tumani", callback_data="district_G‘allaorol tumani")],
 [InlineKeyboardButton(text="Yangiobod tuman", callback_data="district_Yangiobod tuman")],
-[InlineKeyboardButton(text="Ortga qaytish", callback_data="district_back")]
+[InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="district_back")]
 ]
 
 k_jizzakh = InlineKeyboardMarkup(inline_keyboard=jizzakh)
@@ -153,7 +182,7 @@ InlineKeyboardButton(text="Yakkabog‘ tumani", callback_data="district_Yakkabog
 [InlineKeyboardButton(text="Qamashi tumani", callback_data="district_Qamashi tumani"),
 InlineKeyboardButton(text="Qarshi tumani", callback_data="district_Qarshi tumani")],
 [InlineKeyboardButton(text="G‘uzor tuman", callback_data="district_G‘uzor tuman")],
-[InlineKeyboardButton(text="Ortga qaytish", callback_data="district_back")]
+[InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="district_back")]
 ]
 
 k_qashqadaryo = InlineKeyboardMarkup(inline_keyboard=qashqadaryo)
@@ -169,7 +198,7 @@ InlineKeyboardButton(text="Nurota tumani", callback_data="district_Nurota tumani
 InlineKeyboardButton(text="Uchquduq tumani", callback_data="district_Uchquduq tumani")],
 [InlineKeyboardButton(text="Xatirchi tumani", callback_data="district_Xatirchi tumani"),
 InlineKeyboardButton(text="Qiziltepa tuman", callback_data="district_Qiziltepa tuman")],
-[InlineKeyboardButton(text="Ortga qaytish", callback_data="district_back")]
+[InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="district_back")]
 ]
 
 k_A_NAVOIY= InlineKeyboardMarkup(inline_keyboard=A_NAVOIY)
@@ -187,7 +216,7 @@ InlineKeyboardButton(text="Uychi tumani", callback_data="district_Uychi tumani")
 InlineKeyboardButton(text="Chortoq tumani", callback_data="district_Chortoq tumani")],
 [InlineKeyboardButton(text="Chust tumani", callback_data="district_Chust tumani"),
 InlineKeyboardButton(text="Yangiqo‘rg‘on tuman", callback_data="district_Yangiqo‘rg‘on tuman")],
-[InlineKeyboardButton(text="Ortga qaytish", callback_data="district_back")]
+[InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="district_back")]
 ]
 
 k_namangan = InlineKeyboardMarkup(inline_keyboard=namangan)
@@ -210,7 +239,7 @@ InlineKeyboardButton(text="Paxtachi tumani", callback_data="district_Paxtachi tu
 InlineKeyboardButton(text="Toyloq tumani", callback_data="district_Toyloq tumani")],
 [InlineKeyboardButton(text="Urgut tumani", callback_data="district_Urgut tumani"),
 InlineKeyboardButton(text="Qo‘shrabot tuman", callback_data="district_Qo‘shrabot tuman")],
-[InlineKeyboardButton(text="Ortga qaytish", callback_data="district_back")]
+[InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="district_back")]
 ]
 
 k_samarkand = InlineKeyboardMarkup(inline_keyboard=namangan)
@@ -231,7 +260,7 @@ InlineKeyboardButton(text="Uzun tumani", callback_data="district_Uzun tumani")],
 InlineKeyboardButton(text="Sho‘rchi tumani", callback_data="district_Sho‘rchi tumani")],
 [InlineKeyboardButton(text="Qiziriq tumani", callback_data="district_Qiziriq tumani"),
 InlineKeyboardButton(text="Qumqo‘rg‘on tuman", callback_data="district_Qumqo‘rg‘on tuman")],
-[InlineKeyboardButton(text="Ortga qaytish", callback_data="district_back")]
+[InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="district_back")]
 ]
 
 k_surxondaryo = InlineKeyboardMarkup(inline_keyboard=surxondaryo)
@@ -248,7 +277,7 @@ InlineKeyboardButton(text="Sardoba tumani", callback_data="district_Sardoba tuma
 [InlineKeyboardButton(text="Sayxunobod tumani", callback_data="district_Sayxunobod tumani"),
 InlineKeyboardButton(text="Sirdaryo tumani", callback_data="district_Sirdaryo tumani")],
 [InlineKeyboardButton(text="Xovos tuman", callback_data="district_Xovos tuman")],
-[InlineKeyboardButton(text="Ortga qaytish", callback_data="district_back")]
+[InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="district_back")]
 ]
 
 k_sirdaryo = InlineKeyboardMarkup(inline_keyboard=surxondaryo)
@@ -276,7 +305,7 @@ InlineKeyboardButton(text="Toshkent tumani", callback_data="district_Toshkent tu
 InlineKeyboardButton(text="Chinoz tumani", callback_data="district_Chinoz tumani")],
 [InlineKeyboardButton(text="Yuqorichirchiq tumani", callback_data="district_Yuqorichirchiq tumani"),
 InlineKeyboardButton(text="Yangiyo‘l tuman", callback_data="district_Yangiyo‘l tuman")],
-[InlineKeyboardButton(text="Ortga qaytish", callback_data="district_back")]
+[InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="district_back")]
 ]
 
 k_tashkent_reg = InlineKeyboardMarkup(inline_keyboard=tashkent_reg)
@@ -301,7 +330,7 @@ InlineKeyboardButton(text="O‘zbekiston tumani", callback_data="district_O‘zb
 [InlineKeyboardButton(text="Uchko‘prik tumani", callback_data="district_Uchko‘prik tumani"),
 InlineKeyboardButton(text="Farg‘ona tumani", callback_data="district_Farg‘ona tumani")],
 [InlineKeyboardButton(text="Furqat tuman", callback_data="district_Furqat tuman")],
-[InlineKeyboardButton(text="Ortga qaytish", callback_data="district_back")]
+[InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="district_back")]
 ]
 
 k_fergana = InlineKeyboardMarkup(inline_keyboard=fergana)
@@ -319,7 +348,7 @@ InlineKeyboardButton(text="Hazorasp tumani", callback_data="district_Hazorasp tu
 InlineKeyboardButton(text="Yangiariq tumani", callback_data="district_Yangiariq tumani")],
 [InlineKeyboardButton(text="Yangibozor tumani", callback_data="district_Yangibozor tumani"),
 InlineKeyboardButton(text="Qo‘shko‘pir tuman", callback_data="district_Qo‘shko‘pir tuman")],
-[InlineKeyboardButton(text="Ortga qaytish", callback_data="district_back")]
+[InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="district_back")]
 ]
 
 k_xorazm = InlineKeyboardMarkup(inline_keyboard=xorazm)
@@ -336,7 +365,7 @@ InlineKeyboardButton(text="Shayxontohur tumani", callback_data="district_Shayxon
 [InlineKeyboardButton(text="Yunusobod tumani", callback_data="district_Yunusobod tumani"),
 InlineKeyboardButton(text="Yakkasaroy tumani", callback_data="district_Yakkasaroy tumani")],
 [InlineKeyboardButton(text="Yashnobod tuman", callback_data="district_Yashnobod tuman")],
-[InlineKeyboardButton(text="Ortga qaytish", callback_data="district_back")]
+[InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="district_back")]
 ]
 
 k_tashkent_city = InlineKeyboardMarkup(inline_keyboard=tashkent_city)
@@ -356,7 +385,7 @@ InlineKeyboardButton(text="Samarqand viloyati", callback_data="region_Samarqand 
 InlineKeyboardButton(text="Surxondaryo viloyati", callback_data="region_Surxondaryo viloyati")],
 [InlineKeyboardButton(text="Toshkent viloyati", callback_data="region_Toshkent viloyati"),
 InlineKeyboardButton(text="Toshkent shahri", callback_data="region_Toshkent shahri")],
-[InlineKeyboardButton(text="Ortga qaytish", callback_data="region_back")]
+[InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="region_back")]
 ]
 
 k_regions =InlineKeyboardMarkup(inline_keyboard=regions)
@@ -365,7 +394,7 @@ k_regions =InlineKeyboardMarkup(inline_keyboard=regions)
 select_subject_degree =[
 [InlineKeyboardButton(text="1 chi fan", callback_data="first_subject")],
 [InlineKeyboardButton(text="2 chi fan", callback_data="second_subject")],
-[InlineKeyboardButton(text="Ortga qaytish", callback_data="detect_back")]
+[InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="detect_back")]
 ]
 
 k_select_subject_degree= InlineKeyboardMarkup(inline_keyboard=select_subject_degree)
