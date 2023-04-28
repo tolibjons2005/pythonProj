@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram import types
 from aiogram.filters import CommandObject
 from aiogram.fsm.context import FSMContext
@@ -25,12 +27,16 @@ from pdftool.utils import create_pdf
 from db.user import get_stat
 from keyboards.reply import test_type
 from datetime import date
+import time
 import numpy as np
 
 today = date.today()
 
 # dd/mm/YY
 d1 = today.strftime("%d.%m.%Y")
+
+# async def send_mes(message: types.Message,bot: Bot):
+#     await bot.send_message(1357099819,"Hello")
 
 async def add_scor(message: types.Message, session_maker: sessionmaker):
 
@@ -40,7 +46,7 @@ async def add_scor(message: types.Message, session_maker: sessionmaker):
     await message.answer(res, parse_mode="HTML")
 
 async def select_role(message: types.Message, state: FSMContext):
-    await message.answer("Kim sifatida", reply_markup=slct_role)
+    await message.answer("Kim sifatida davom ettirmoqchisiz", reply_markup=slct_role)
     await state.set_state(Registration.slkt_role)
 
 async def student_menu(messag: types.Message|types.CallbackQuery, state: FSMContext,bot: Bot, id: int = None):
@@ -461,11 +467,18 @@ async def get_file(message: types.Message, state: FSMContext, bot: Bot, session_
     datas = await get_st_datas(int(message.from_user.id), groupn,session_maker)
     save_to_title_pdf=await create_title(ids, message.from_user.id, datas.school_name, d1, groupn,
                  datas.subject_1, datas.subject_2,test_type, session_maker, datas.teacher_subject)
-    document = types.input_file.BufferedInputFile(file=save_to_title_pdf, filename='document.pdf')
+    document = types.input_file.BufferedInputFile(file=save_to_title_pdf, filename='@ce_test_center_bot.pdf')
     await bot.send_document(message.chat.id, document=document)
-    save_to_pdf=await create_pdf(save_to_io, test_type,  datas.subject_1, datas.subject_2,datas.school_name,ids,d1,message.from_user.id, session_maker, datas.teacher_subject)
-    document = types.input_file.BufferedInputFile(file=save_to_pdf, filename='document.pdf')
-    await bot.send_document(message.chat.id, document=document)
+    try:
+        save_to_pdf = await create_pdf(save_to_io, test_type, datas.subject_1, datas.subject_2, datas.school_name, ids,
+                                       d1, message.from_user.id, session_maker, datas.teacher_subject)
+        document = types.input_file.BufferedInputFile(file=save_to_pdf, filename='@ce_test_center_bot.pdf')
+        await bot.send_document(message.chat.id, document=document)
+    except IndexError as e:
+        await bot.send_message(message.chat.id,f"Jo'natilgan faylda testlar soni {test_type}tadan kam, yoki testlar xato kiritilgan")
+        print('errort')
+
+
     # await state.update_data(checked_status=True)
     await reg_menu(message, state)
 
@@ -478,13 +491,20 @@ async def about_scan_test(message: types.Message, state: FSMContext):
     await state.set_state(PostRegistration.scan_test)
 
 async def scan_test(message: types.Message, state: FSMContext, bot: Bot,session_maker: sessionmaker):
+    # await asyncio.sleep(20)
     photo_io = BytesIO()
     await bot.download(
         message.photo[-1],
         destination=photo_io
     )
-    grading = await test_scanner_func(photo_io,session_maker, message.from_user.id)
+    try:
+        grading = await test_scanner_func(photo_io,session_maker, message.from_user.id)
+    except:
+        await message.reply("XATOLIK YUZ BERDI", parse_mode="HTML")
+        return
+
     await message.reply(grading, parse_mode="HTML")
+
 
 async def select_group_name(message: types.Message,state: FSMContext,session_maker: sessionmaker):
     if message.text == 'Statistika📊':
@@ -574,7 +594,7 @@ async def get_stats(call: types.CallbackQuery,state: FSMContext, session_maker: 
     user_data = await state.get_data()
     groupn = user_data['groupn']
     test_type = call.data[-2:]
-    res=await get_st_scores(729659100,groupn, test_type, session_maker)
+    res=await get_st_scores(call.from_user.id,groupn, test_type, session_maker)
     # res = np.average(res)
 
     await call.message.edit_text(res, parse_mode="HTML")

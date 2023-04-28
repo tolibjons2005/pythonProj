@@ -25,6 +25,7 @@ bot_commands = (('start', 'Start  starts', 'Start  starts bot'),
 def register_user_commands(router: Router) -> None:
     # router.message.register(show_user)
     # router.message.register(add_scor, CommandStart())
+    # router.message.register(send_mes, CommandStart())
     router.message.register(register_subject, F.text == 'Ortga qaytish🔙', Registration.register_group_name)
     router.message.register(register_back, F.text == "Ortga qaytish🔙")
 

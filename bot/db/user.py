@@ -275,9 +275,8 @@ async def get_st_scores(user_id: int,group_name:str, test_type:str, session_make
                 select(User.st_fullname)
                 .filter(User.teacher_id == user_id, User.group_name==group_name)  # type: ignore
             )
-            names= resut.scalars().all()
-            names = np.array(names)
-            score = []
+
+
             if test_type == '90':
                 result = await session.execute(
                     select(User.st_score90)
@@ -290,26 +289,39 @@ async def get_st_scores(user_id: int,group_name:str, test_type:str, session_make
                     .filter(User.teacher_id == user_id, User.group_name == group_name)  # type: ignore
                 )
                 ball = '30 ta'
+            try:
+                names = resut.scalars().all()
+                names = np.array(names)
+                score = []
+
+                for j in result.scalars().all():
+                    if j == None:
+                        score.append(0)
+                    else:
+                        score.append(np.average(j))
+
+                score = np.array(score)
+                idx = np.argsort(-score)
+                score = np.array(score)[idx]
+                names = np.array(names)[idx]
+                text = ''
+                emoji = '🥇🥈🥉'
+                for i in range(len(score)):
+                    if i in [0, 1, 2]:
+                        text += f"\n{emoji[i]} {html.bold(html.quote(names[i]))} - {round(score[i], 1)}/{ball}"
+                    else:
+                        text += f"\n {i + 1}.  {html.bold(html.quote(names[i]))} - {round(score[i], 1)}/{ball} "
 
 
-            for j in result.scalars().all():
-                if j == None:
-                    score.append(0)
-                else:
-                    score.append(np.average(j))
 
-            score = np.array(score)
-            idx = np.argsort(-score)
-            score = np.array(score)[idx]
-            names = np.array(names)[idx]
-            text = ''
-            emoji = '🥇🥈🥉'
+            except:
+                name = resut.scalars().one()
+                score=np.average(result.scalars().one())
+                text = f"\n🥇 {html.bold(html.quote(name))} - {round(score, 1)}/{ball}"
 
-            for i in range(len(score)):
-                if i in [0,1,2]:
-                    text+=f"\n{emoji[i]} {html.bold(html.quote(names[i]))} - {round(score[i], 1)}/{ball}"
-                else:
-                    text += f"\n {i+1}.  {html.bold(html.quote(names[i]))} - {round(score[i], 1)}/{ball} "
+
+
+
 
 
 

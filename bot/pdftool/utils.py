@@ -42,7 +42,9 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
     # Path
     path = os.path.join(parent_dir, directory)
     os.makedirs(path)
+
     text1 = get_str(tid,output_file)
+
     i= 0
     func_string = ""
     tests =''
@@ -144,7 +146,14 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
 
 
         for k in ids:
-            text,answ = get_string(text1, test_type, second_sub, third_sub, rown, rown2 )
+            try:
+
+                text,answ = get_string(text1, test_type, second_sub, third_sub, rown, rown2 )
+            except IndexError as e:
+                shutil.rmtree(path)
+                raise
+                break
+            print('TOLIBJON')
             i += 1
             id = k.student_id
             name = k.st_fullname

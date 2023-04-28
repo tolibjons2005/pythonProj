@@ -42,12 +42,12 @@ async def test_scanner_func(imgg, session_maker, teacher_id):
                               cv2.THRESH_BINARY,  # thresholding type
                               53,  # block size (5x5 window)
                               5)
-        cv2.imshow('h',imTH)
+        # cv2.imshow('h',imTH)
         code = decode(imTH)
 
-        cv2.waitKey(0);
-        cv2.destroyAllWindows();
-        cv2.waitKey(1)
+        # cv2.waitKey(0);
+        # cv2.destroyAllWindows();
+        # cv2.waitKey(1)
 
     userid = code[0].data.decode('utf-8')
     print(userid)
@@ -74,7 +74,7 @@ async def test_scanner_func(imgg, session_maker, teacher_id):
 
     if ans =='8':
         grading=' '
-        resultg = 188.9
+        resultg = 'Ushbu test tekshirilgan'
         h, w, c = img.shape
 
         if code[0].orientation == 'UP':
@@ -127,10 +127,10 @@ async def test_scanner_func(imgg, session_maker, teacher_id):
             img = cv2.rotate(img, cv2.ROTATE_180)
 
         code = decode(img)
-        cv2.imshow('ghh',img)
-        cv2.waitKey(0);
-        cv2.destroyAllWindows();
-        cv2.waitKey(1)
+        # cv2.imshow('ghh',img)
+        # cv2.waitKey(0);
+        # cv2.destroyAllWindows();
+        # cv2.waitKey(1)
         return resultg
     else:
         # Using cv2.rectangle() method
@@ -191,11 +191,11 @@ async def test_scanner_func(imgg, session_maker, teacher_id):
 
 
         # code = decode(img)
-        cv2.imshow('ghh',img)
-
-        cv2.waitKey(0);
-        cv2.destroyAllWindows();
-        cv2.waitKey(1)
+        # cv2.imshow('ghh',img)
+        #
+        # cv2.waitKey(0);
+        # cv2.destroyAllWindows();
+        # cv2.waitKey(1)
 
 
 
@@ -414,7 +414,7 @@ async def test_scanner_func(imgg, session_maker, teacher_id):
         for i in range(questions):
             dsn_message+=f"\n{symb[i]}  {symb[i + questions]}  {symb[i + questions*2]}"
 
-        await add_ans_message(int(id), dsn_message.replace('\n', '%^'), session_maker)
+        await add_ans_message(int(id),teacher_id, dsn_message.replace('\n', '%^'), session_maker)
 
 
 
