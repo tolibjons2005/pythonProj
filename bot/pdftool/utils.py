@@ -153,7 +153,7 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
                 shutil.rmtree(path)
                 raise
                 break
-            print('TOLIBJON')
+            # print('TOLIBJON')
             i += 1
             id = k.student_id
             name = k.st_fullname
@@ -358,14 +358,14 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
         # 'disable-local-file-access': ''
 
     }
-    print("--- %s seconds ---" % (time.time() - start_time))
+    # print("--- %s seconds ---" % (time.time() - start_time))
     # pdfkit.from_string(output_text, output_path=f"{n}", options=options, configuration=config,
     #                    css="template/template.css")
 
     save_to_io = pdfkit.from_string(output_text,  options=options, configuration=config, css="./pdftool/template/template.css")
 
-    print("--- %s seconds ---" % (time.time() - start_time))
-    shutil.rmtree(path)
+    # print("--- %s seconds ---" % (time.time() - start_time))
+    # shutil.rmtree(path)
     return save_to_io
 
 

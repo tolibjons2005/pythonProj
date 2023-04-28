@@ -73,8 +73,8 @@ async def result_msg(call: types.CallbackQuery, state: FSMContext,bot:Bot, sessi
     await student_menu(call, state, bot, call.from_user.id)
 async def tutorial(message: types.Message, state: FSMContext):
     await message.answer(f"Qo'llanmani o‘qib chiqing!🔤", reply_markup=clear, parse_mode="HTML")
-    await state.set_state(Registration.tutorial)
-    # await state.set_state(PostRegistration.menu)
+    # await state.set_state(Registration.tutorial)
+    await state.set_state(PostRegistration.menu)
 
 async def register_t_name(message: types.Message, state: FSMContext):
     await message.answer(f"Ism familiyangiz rostan {message.from_user.full_name}mi?\n\nAgar ism to‘g‘ri bo‘lsa pastdagi 'Ha' tugmasini bosing, unday bo‘lmasa to‘g‘ri ismni jo‘nating", reply_markup=yes)
@@ -474,6 +474,7 @@ async def get_file(message: types.Message, state: FSMContext, bot: Bot, session_
                                        d1, message.from_user.id, session_maker, datas.teacher_subject)
         document = types.input_file.BufferedInputFile(file=save_to_pdf, filename='@ce_test_center_bot.pdf')
         await bot.send_document(message.chat.id, document=document)
+
     except IndexError as e:
         await bot.send_message(message.chat.id,f"Jo'natilgan faylda testlar soni {test_type}tadan kam, yoki testlar xato kiritilgan")
         print('errort')
