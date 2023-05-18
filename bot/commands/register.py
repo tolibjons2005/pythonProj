@@ -56,28 +56,31 @@ async def student_menu(messag: types.Message|types.CallbackQuery, state: FSMCont
     else:
         await bot.send_message(id,"Natijalarni ko‘rish", reply_markup=student_key)
     await state.set_state(Registration.show_res)
-async def select_sub_name(message: types.Message,state: FSMContext,session_maker: sessionmaker):
+async def select_sub_name(message: types.Message,state: FSMContext,session_maker: sessionmaker,bot: Bot):
 
 
     sub_names = await get_sub_names(int(message.from_user.id), session_maker)
-    builder = InlineKeyboardBuilder()
-    for i in sub_names:
-        builder.add(types.InlineKeyboardButton(text=i, callback_data=f'sub_{i}'))
-    builder.adjust(1)
-
-
-    await message.answer("Qaysi ustoz olgan test natijasi:",reply_markup=builder.as_markup())
+    print(sub_names)
+    if sub_names != []:
+        builder = InlineKeyboardBuilder()
+        for i in sub_names:
+            builder.add(types.InlineKeyboardButton(text=i, callback_data=f'sub_{i}'))
+        builder.adjust(1)
+        await message.answer("Qaysi ustoz olgan test natijasi:",reply_markup=builder.as_markup())
+    else:
+        await message.answer('Siz hech qaysi guruhga qo‘shilmagansiz')
+        await student_menu(message, state, bot)
 async def result_msg(call: types.CallbackQuery, state: FSMContext,bot:Bot, session_maker: sessionmaker):
     result = await get_ans_message(call.from_user.id,call.data[4:], session_maker)
     await call.message.answer(result.replace('%^', "\n"), parse_mode="HTML")
     await student_menu(call, state, bot, call.from_user.id)
 async def tutorial(message: types.Message, state: FSMContext):
     await message.answer(f"Qo'llanmani o‘qib chiqing!🔤", reply_markup=clear, parse_mode="HTML")
-    # await state.set_state(Registration.tutorial)
-    await state.set_state(PostRegistration.menu)
+    await state.set_state(Registration.tutorial)
+    #await state.set_state(PostRegistration.menu)
 
 async def register_t_name(message: types.Message, state: FSMContext):
-    await message.answer(f"Ism familiyangiz rostan {message.from_user.full_name}mi?\n\nAgar ism to‘g‘ri bo‘lsa pastdagi 'Ha' tugmasini bosing, unday bo‘lmasa to‘g‘ri ismni jo‘nating", reply_markup=yes)
+    await message.answer(f"Ism familiyangiz rostan {message.from_user.full_name}mi?\n\nAgar ism-familiyangiz to‘g‘ri bo‘lsa pastdagi 'Ha' tugmasini bosing, unday bo‘lmasa to‘g‘ri ism-famiiyani jo‘nating", reply_markup=yes)
     await state.set_state(Registration.register_t_name)
 
 async def register_school_name(message: types.Message, state: FSMContext,  bot: Bot):
@@ -107,7 +110,7 @@ async def register_school_name(message: types.Message, state: FSMContext,  bot: 
 
 
     await bot.send_message(useid,f"👤<b>ISM FAMILIYA:</b> {html.italic(html.quote(t_name))}\n\nAgar ism familiyangizda xatolik bo'lsa \"Ortga qaytish🔙\" tugmasini bosib qaytadan jo‘nating", parse_mode="HTML")
-    await bot.send_message(useid,f"🏫O'quv muassasasi nomini jo‘nating:", reply_markup=back)
+    await bot.send_message(useid,f"🏫O'quv muassasasi nomini jo‘nating:", reply_markup=await back('TTA akademik litseyi'))
     await state.set_state(Registration.register_school_name)
 
 
@@ -186,7 +189,7 @@ async def register_subject(call: types.CallbackQuery, state: FSMContext, bot: Bo
 
 
 
-    await bot.send_message(useid,f"👤<b>ISM FAMILIYA:</b> {html.italic(html.quote(t_name))}\n🏫<b>O‘QUV MUASSASI NOMI:</b> {html.italic(html.quote(scname))}\n🏙<b>HUDUD:</b> <i>{region}</i>\n🏙<b>TUMAN:</b> {district}\n\n--------------------\n\n<i>Agar yuqoridagi ma’lumotlarda xatolik bo‘lsa \"Ortga qaytish🔙\" tugmasini bosib qaytadan jo‘natishingiz mumkin</i>\n\n", reply_markup=back, parse_mode="HTML")
+    await bot.send_message(useid,f"👤<b>ISM FAMILIYA:</b> {html.italic(html.quote(t_name))}\n🏫<b>O‘QUV MUASSASI NOMI:</b> {html.italic(html.quote(scname))}\n🏙<b>HUDUD:</b> <i>{region}</i>\n🏙<b>TUMAN:</b> {district}\n\n--------------------\n\n<i>Agar yuqoridagi ma’lumotlarda xatolik bo‘lsa \"Ortga qaytish🔙\" tugmasini bosib qaytadan jo‘natishingiz mumkin</i>\n\n", parse_mode="HTML")
 
     await bot.send_message(useid,f"Pastdan kerakli fanni tanlang:", reply_markup=keyboard)
     await state.set_state(Registration.register_subject)
@@ -211,11 +214,11 @@ async def register_group_name(call: types.CallbackQuery,state: FSMContext):
                               f"<i>Agar yuqoridagi ma’lumotlarda xatolik bo‘lsa \"Ortga qaytish🔙\" tugmasini bosib qaytadan jo‘natishingiz mumkin</i>\n\n", parse_mode="HTML")
     await call.message.answer(
         f"Guruh nomini kiriting:",
-        reply_markup=back)
+        reply_markup=await back('20-02'))
     await state.set_state(Registration.register_group_name)
 
 async def register_new_group_name(message: types.Message, state: FSMContext, session_maker:sessionmaker):
-    await message.answer('Yangi guruh nomi:', reply_markup=back)
+    await message.answer('Yangi guruh nomi:', reply_markup=await back('20-02'))
     tsub = await get_t_sub(message.from_user.id, session_maker)
     await state.update_data(t_subject=tsub, user_id=message.from_user.id)
     await state.set_state(PostRegistration.new_gr)
@@ -389,9 +392,17 @@ async def register_students(message: types.Message, state: FSMContext, session_m
     state_name = await state.get_state()
 
     if message.forward_from:
-        await message.reply(f"O'quvchi ro'yxatga olindi")
+        
+        #students_id.append(message.forward_from.id)
+        #students_name.append(message.text)
         students_id.append(message.forward_from.id)
         students_name.append(message.text)
+        
+
+        
+        await state.update_data(students_id=students_id, students_name=students_name)
+        await message.reply(f"O'quvchi ro'yxatga olindi")
+        
 
         print(message.forward_from)
     elif message.text == "Ortga qaytish🔙" and state_name =="Registration:end":
@@ -442,7 +453,7 @@ async def registered_menu(message: types.Message, state: FSMContext, session_mak
         await message.answer(f'Ro\'yxatdan o\'tishni yakunlandi', reply_markup=end_register)
         await state.set_state(Registration.end)
     else:
-        await message.answer(f'O\'qvchi qo\'shilmagan, qaytadan qo\'shing', reply_markup=end)
+        await message.answer(f'O\'quvchi qo\'shilmagan, qaytadan qo\'shing', reply_markup=end)
 
 
 
@@ -589,6 +600,7 @@ async def edit_add_students(call: types.CallbackQuery, state: FSMContext):
         reply_markup=end)
     await state.update_data(students_id=[], students_name=[], group_name=call.data[3:])
     await state.set_state(PostRegistration.add_students)
+    
 
 
 async def get_stats(call: types.CallbackQuery,state: FSMContext, session_maker: sessionmaker):
@@ -610,7 +622,7 @@ async def register_back(message: types.Message, state: FSMContext, bot: Bot, ses
     elif state_name == 'Registration:show_res':
         await select_role(message, state)
     elif state_name == 'Registration:register_subject':
-        await register_school_name(message, state)
+        await register_school_name(message, state,bot)
     elif state_name == "Registration:register_students":
         await register_subject(message, state, bot)
     elif state_name == 'PostRegistration:register_students_new':

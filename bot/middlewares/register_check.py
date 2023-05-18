@@ -42,28 +42,49 @@
 #
 #         return await handler(event, data)
 
-import datetime
+# import datetime
 from typing import Callable, Awaitable, Dict, Any
 
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, Message, CallbackQuery
 
-class ThrottlingMiddleware(BaseMiddleware):
-    time_updates: dict[int, datetime.datetime] = {}
-    timedelta_limiter: datetime.timedelta = datetime.timedelta(seconds=1)
+# class ThrottlingMiddleware(BaseMiddleware):
+#     time_updates: dict[int, datetime.datetime] = {}
+#     timedelta_limiter: datetime.timedelta = datetime.timedelta(seconds=1)
 
+#     async def __call__(
+#             self,
+#             handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
+#             event: TelegramObject,
+#             data: Dict[str, Any],
+#     ) -> Any:
+#         if isinstance(event, (Message, CallbackQuery)):
+#             user_id = event.from_user.id
+#             if user_id in self.time_updates.keys():
+#                 if (datetime.datetime.now() - self.time_updates[user_id]) > self.timedelta_limiter:
+#                     self.time_updates[user_id] = datetime.datetime.now()
+#                     return await handler(event, data)
+#             else:
+#                 self.time_updates[user_id] = datetime.datetime.now()
+#                 return await handler(event, data)
+
+from aiogram.dispatcher.flags import get_flag
+from aiogram.utils.chat_action import ChatActionSender
+
+class ChatActionMiddleware(BaseMiddleware):
     async def __call__(
-            self,
-            handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
-            event: TelegramObject,
-            data: Dict[str, Any],
-    ) -> Any:
-        if isinstance(event, (Message, CallbackQuery)):
-            user_id = event.from_user.id
-            if user_id in self.time_updates.keys():
-                if (datetime.datetime.now() - self.time_updates[user_id]) > self.timedelta_limiter:
-                    self.time_updates[user_id] = datetime.datetime.now()
-                    return await handler(event, data)
-            else:
-                self.time_updates[user_id] = datetime.datetime.now()
-                return await handler(event, data)
+        self,
+        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+        event: Message,
+        data: Dict[str, Any]
+        ) -> Any:
+        long_operation_type = get_flag(data, "long_operation")
+        
+        if not long_operation_type:
+            return await handler(event, data)
+            
+        async with ChatActionSender(
+                action=long_operation_type, 
+                chat_id=event.chat.id
+            ):
+            return await handler(event, data)

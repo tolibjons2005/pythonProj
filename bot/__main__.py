@@ -4,15 +4,17 @@ import asyncio
 import pstats
 
 from aiogram import Dispatcher, Bot
-from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.types import BotCommand
 # from aioredis import Redis
 from sqlalchemy.engine import URL
 from dotenv import load_dotenv
+from aioredis import Redis
 
 
 
-# from bot.middlewares.register_check import ThrottlingMiddleware
+
+from middlewares.register_check import ChatActionMiddleware
 from commands import register_user_commands, bot_commands
 from db import BaseModel, create_async_engine, get_session_maker, proceed_schemas
 
@@ -26,15 +28,15 @@ async def main() -> None:
     for cmd in bot_commands:
         commands_for_bot.append(BotCommand(command=cmd[0], description=cmd[1]))
 
-    # redis = Redis()
+    redis = Redis().from_url('redis://default:4ZxLzxTFackwwN7goksA@containers-us-west-40.railway.app:6460')
     # redis
 
 
 
-    storage = MemoryStorage()
-    dp =Dispatcher(storage=storage)
+    #storage = MemoryStorage()
+    dp =Dispatcher(storage=RedisStorage(redis=redis))
     bot = Bot(token=os.getenv('token'))
-    # dp.message.middleware(ThrottlingMiddleware())
+    dp.message.middleware(ChatActionMiddleware())
 
 
     # dp.callback_query.middleware(RegisterCheck())

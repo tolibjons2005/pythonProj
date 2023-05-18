@@ -93,7 +93,7 @@ def register_user_commands(router: Router) -> None:
 
     router.message.register(register_students, Registration.register_students)
     router.message.register(register_back, F.text == "Ortga qaytish🔙")
-    router.message.register(get_file, F.document,PostRegistration.send_file)
+    router.message.register(get_file, F.document,PostRegistration.send_file, flags={"long_operation":"upload_document"})
     router.message.register(scan_test, F.photo, PostRegistration.scan_test)
 
 

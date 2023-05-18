@@ -1,18 +1,18 @@
 @font-face {
 	font-family: Montserrat;
-	src: url(file:///D:/pythonProject/montserrat/Regular.ttf);
+	src: url(file:///home/tolibjon/BOT/pythonProject/montserrat/Regular.ttf);
 	font-weight: normal;
   }
 
  @font-face {
     font-family: Montserrat;
-	src: url(file:///D:/pythonProject/montserrat/Medium.ttf);
+	src: url(file:///home/tolibjon/BOT/pythonProject/montserrat/Medium.ttf);
 	font-weight: 500;
   }
 
  @font-face {
 	font-family: Montserrat;
-	src: url(file:///D:/pythonProject/montserrat/SemiBold.ttf);
+	src: url(file:///home/tolibjon/BOT/pythonProject/montserrat/SemiBold.ttf);
 	font-weight: 600;
   }
 body{

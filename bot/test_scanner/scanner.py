@@ -281,9 +281,9 @@ async def test_scanner_func(imgg, session_maker, teacher_id):
             print("---------sfgsf-----", np.amax(myPixelVal))
             max_val = np.amax(myPixelVal) - 250.0
             if max_val > (np.amax(np.amin(np.amax(myPixelVal, axis=2), axis=1))):
-                pass
-            else:
                 max_val = 1000.0
+            else:
+                pass
 
             for x in range(0, len(myPixelVal[0])):
                 arr = myPixelVal[0][x]
@@ -400,13 +400,18 @@ async def test_scanner_func(imgg, session_maker, teacher_id):
         thirds = grading[questions*2:questions*3].count('1')
         if test_type =='90':
             resultg = (firsts * 1.1 + seconds * 3.1 + thirds * 2.1)
+            resultg=round(resultg, 1)
+            anw_message = f'{html.bold(html.quote(fullname))}\n———————————-\n<tg-spoiler>{resultg} ball</tg-spoiler>\n———————————-\n<tg-spoiler><b>Majburiy fanlar:</b> {firsts}\n<b>{second_s}:</b> {seconds}\n<b>{third_s}:</b> {thirds}</tg-spoiler>\n———————————-'
         else:
+        
             resultg = (firsts + seconds + thirds )*1.0
+            resultg=round(resultg, 1)
+            anw_message = f'{html.bold(html.quote(fullname))}\n———————————-\n<tg-spoiler>{resultg} ta to‘g‘ri</tg-spoiler>\n———————————-'
 
-        resultg=round(resultg, 1)
+        
 
 
-        anw_message = f'{html.bold(html.quote(fullname))}\n———————————-\n<tg-spoiler>{resultg} ball</tg-spoiler>\n———————————-\n<tg-spoiler><b>Majburiy fanlar:</b> {firsts}\n<b>{second_s}:</b> {seconds}\n<b>{third_s}:</b> {thirds}</tg-spoiler>\n———————————-'
+
 
 
 

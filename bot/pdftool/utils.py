@@ -29,14 +29,14 @@ context = {
 }
 
 
-config = pdfkit.configuration(wkhtmltopdf=path_to_wkhtmltopdf)
+config = pdfkit.configuration()
 template_loader = jinja2.FileSystemLoader('./')
 template_env=jinja2.Environment(loader=template_loader)
 
 
 
 async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids, date, tid, session_maker, t_sub):
-    parent_dir = "D:/pythonProject/bot/img"
+    parent_dir = "/home/tolibjon/BOT/pythonProject/bot/img"
     directory = f"id{tid}"
 
     # Path
@@ -123,7 +123,7 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
 
         # template = template_env.get_template('./pdftool/template/templatecopy.html')
         # context['block1'] = get_string(output_file, test_type)
-        delay= '5000'
+        delay= '6000'
     else:
         rown = False
         rown2 = False
@@ -332,7 +332,7 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
         context['date']=date
 
         context['tests'] = tests
-        delay= '3000'
+        delay= '15000'
 
 
 
@@ -354,7 +354,8 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
         'no-outline': '',
         'disable-smart-shrinking': True,
         'enable-local-file-access': '',
-        'debug-javascript':''
+        'debug-javascript':'',
+        #'no-stop-slow-scipts':''
         # 'disable-local-file-access': ''
 
     }
@@ -365,7 +366,7 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
     save_to_io = pdfkit.from_string(output_text,  options=options, configuration=config, css="./pdftool/template/template.css")
 
     # print("--- %s seconds ---" % (time.time() - start_time))
-    # shutil.rmtree(path)
+    shutil.rmtree(path)
     return save_to_io
 
 

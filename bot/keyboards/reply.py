@@ -15,11 +15,15 @@ clear = ReplyKeyboardMarkup(
 yes =ReplyKeyboardMarkup(
     keyboard=[
     [KeyboardButton(text="Ha")]
-], resize_keyboard=True )
-back = ReplyKeyboardMarkup(
-    keyboard=[
-    [KeyboardButton(text="Ortga qaytish🔙")]
-], resize_keyboard=True )
+], resize_keyboard=True, input_field_placeholder='Tolibjon Komiljonov' )
+
+async def back(txt):
+    bac = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Ortga qaytish🔙")]
+        ], resize_keyboard=True, input_field_placeholder=txt, one_time_keyboard=True)
+    return bac
+
 #
 back_2_menu = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text="Asosiy menyuga qaytish🔙")]

@@ -10,7 +10,7 @@ from sqlalchemy.ext.mutable import MutableList
 from .base import BaseModel
 from sqlalchemy.exc import ProgrammingError, IntegrityError, SQLAlchemyError
 
-from sqlalchemy import Column, String, Integer, VARCHAR, select,  ARRAY  # type: ignore
+from sqlalchemy import Column, String, Integer, VARCHAR, select,  ARRAY, BigInteger  # type: ignore
 
 from sqlalchemy.orm import sessionmaker, relationship, selectinload, load_only  # type: ignore
 from sqlalchemy import update
@@ -23,9 +23,9 @@ class User(BaseModel):
     numer = Column(Integer, primary_key=True, autoincrement=True)
 
 
-    student_id = Column(Integer,  nullable=False)
+    student_id = Column(BigInteger,  nullable=False)
 
-    teacher_id = Column(Integer, nullable=False)
+    teacher_id = Column(BigInteger, nullable=False)
 
     st_fullname = Column(VARCHAR(30),  nullable=False)
 
@@ -361,14 +361,16 @@ async def add_ans_message(user_id: int, teacher_id:int, message:str, session_mak
 async def get_ans_message(user_id: int,subject:str, session_maker: sessionmaker):
     async with session_maker() as session:
         async with session.begin():
-            try:
-                result = await session.execute(
-                    select(User.ans_message)
-                    .filter(User.student_id == user_id, User.t_fullname==subject)  # type: ignore
-                )
+            result = await session.execute(
+                select(User.ans_message)
+                .filter(User.student_id == user_id, User.t_fullname == subject)  # type: ignore
+            )
+
+                
+            if result != None:
                 return result.scalars().one()
-            except:
-                return "Test tekshirilgan"
+            else:
+                return "Test tekshirilmagan"
 
 # async def increase_n_test(user_id: int, session_maker: sessionmaker):
 #     async with session_maker() as session:
