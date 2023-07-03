@@ -10,8 +10,8 @@ from aiogram.types import BotCommand
 from sqlalchemy.engine import URL
 from dotenv import load_dotenv
 from aioredis import Redis
-
-
+from arq import create_pool
+from config import conf
 
 
 from middlewares.register_check import ChatActionMiddleware
@@ -60,8 +60,10 @@ async def main() -> None:
     async_engine = create_async_engine(postgres_url)
     session_maker = get_session_maker(async_engine)
     await proceed_schemas(async_engine, BaseModel.metadata)
+    redis_pool= await create_pool(conf.redis.pool_settings)
 
-    await dp.start_polling(bot, session_maker=session_maker)
+
+    await dp.start_polling(bot, session_maker=session_maker, arqredis = redis_pool)
 
 
 if __name__ == '__main__':

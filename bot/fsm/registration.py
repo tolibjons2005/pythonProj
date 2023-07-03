@@ -21,5 +21,7 @@ class PostRegistration(StatesGroup):
     stats = State()
     new_gr = State()
     register_students_new = State()
+    delete_students = State()
+    post_new_gr = State()
 
 

@@ -29,22 +29,33 @@ back_2_menu = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text="Asosiy menyuga qaytish🔙")]
 ], resize_keyboard=True )
 end_register = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text="Ro‘yxatdan o‘tishni yakunlash")],
-[KeyboardButton(text="Ortga qaytish🔙")]
+    [KeyboardButton(text="Davom etish⏩")]
 ], resize_keyboard=True )
 menu = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Test yaratish📝"),KeyboardButton(text="Natijalarni tekshirish✅❌")], [KeyboardButton(text="Ma'lumotlarni tahrirlash✏️")], [KeyboardButton(text="Statistika📊")]], resize_keyboard=True)
 end = ReplyKeyboardMarkup(
     keyboard=[
-    [KeyboardButton(text="Qo'shishni yakunlash")],
+    [KeyboardButton(text="Qo‘shishni yakunlash")],
 
     [KeyboardButton(text="Ortga qaytish🔙")]
 ], resize_keyboard=True )
+nend = ReplyKeyboardMarkup(
+    keyboard=[
+    [KeyboardButton(text="Qo‘shishni yakunlash")]
 
+
+], resize_keyboard=True )
+del_end=ReplyKeyboardMarkup(
+    keyboard=[
+    [KeyboardButton(text="O‘chirishni yakunlash")]
+
+
+], resize_keyboard=True )
 edit_menu = ReplyKeyboardMarkup(
     keyboard=[
-    [KeyboardButton(text="O'quvchi qo'shish")],
+    [KeyboardButton(text="O‘quvchi qo‘shish➕")],
 
-[KeyboardButton(text="Yangi guruh qo'shish")],
+[KeyboardButton(text="Yangi guruh qo‘shish➕")],
+[KeyboardButton(text="O‘quvchini o‘chirish🗑")],
 
 
     [KeyboardButton(text="Asosiy menyuga qaytish🔙")],
@@ -52,10 +63,10 @@ edit_menu = ReplyKeyboardMarkup(
 ], resize_keyboard=True )
 slct_role = ReplyKeyboardMarkup(
     keyboard=[
-    [KeyboardButton(text="O‘qituvchi")],
+    [KeyboardButton(text="Ustoz👨‍🏫👩‍🏫")],
 
 
-    [KeyboardButton(text="O‘quvchi")],
+    [KeyboardButton(text="Bo‘lajak talaba👨‍🎓👩‍🎓")],
 [KeyboardButton(text="Ortga qaytish🔙")]
 ], resize_keyboard=True )
 student_key = ReplyKeyboardMarkup(
@@ -68,7 +79,7 @@ student_key = ReplyKeyboardMarkup(
 ], resize_keyboard=True )
 test_type = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='90 talik (blok)', callback_data="test_type_90")],[InlineKeyboardButton(text='30 talik', callback_data="test_type_30")]])
 
-
+re_choose_gr=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Qaytadan tanlash🔁", callback_data="re_choose_gr")]])
 buttons = [
     [InlineKeyboardButton(text="Biologiya", callback_data="data_Biologiya"),
     InlineKeyboardButton(text="Fizika", callback_data="data_Fizika")],
@@ -402,3 +413,19 @@ select_subject_degree =[
 ]
 
 k_select_subject_degree= InlineKeyboardMarkup(inline_keyboard=select_subject_degree)
+
+sselect_book_type =[
+[InlineKeyboardButton(text="1📃", callback_data="book_1"),
+InlineKeyboardButton(text="2📖", callback_data="book_2")],
+
+]
+
+k_select_book_type = InlineKeyboardMarkup(inline_keyboard=sselect_book_type)
+
+sselect_book_type30 =[
+[InlineKeyboardButton(text="1📃", callback_data="book30_1"),
+InlineKeyboardButton(text="2📖", callback_data="book30_2")],
+
+]
+
+k_select_book_type30 = InlineKeyboardMarkup(inline_keyboard=sselect_book_type30)

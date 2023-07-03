@@ -26,7 +26,7 @@ context = {
 }
 
 
-config = pdfkit.configuration()
+config = pdfkit.configuration(wkhtmltopdf=path_to_wkhtmltopdf)
 template_loader = jinja2.FileSystemLoader('./')
 template_env=jinja2.Environment(loader=template_loader)
 
@@ -44,7 +44,7 @@ async def create_title(ids, tid, name_s, date, groupname, second_sub, third_sub,
 
             code += f"""<div class="up_block">
                    <div class="list_of_data">
-                       <img class='qr' src="file:///home/tolibjon/BOT/pythonProject/bot/pdftool/qrcodes/id{tid}/id{i.student_id}.png" alt="Girl in a jacket" width="234px" height="234px">
+                       <img class='qr' src="file:///D:/pythonProject/bot/pdftool/qrcodes/id{tid}/id{i.student_id}.png" alt="Girl in a jacket" width="234px" height="234px">
                        <span class="bold">MUASSASA NOMI: </span>{name_s}</br>
                        <span class="bold">BUYURTMA SANASI: </span>{date}</br>
                        <span class="bold">GURUH NOMI: </span>{groupname}
@@ -62,7 +62,7 @@ async def create_title(ids, tid, name_s, date, groupname, second_sub, third_sub,
                </div>
 
 
-               <img class="title" src="file:///home/tolibjon/BOT/pythonProject/bot/pdftool/template/title.png" alt="Girl in a jacket" width="968px" height="1288px">
+               <img class="title" src="file:///D:/pythonProject/bot/pdftool/template/title.png" alt="Girl in a jacket" width="968px" height="1288px">
                """
         margin_bottom = '0px'
     elif test_type == '30':
@@ -75,7 +75,7 @@ async def create_title(ids, tid, name_s, date, groupname, second_sub, third_sub,
             code += f"""
                 <div class="up_block">
             <div class="list_of_data">
-                <img class='qr' src="file:///home/tolibjon/BOT/pythonProject/bot/pdftool/qrcodes/id{tid}/id{i.student_id}.png" alt="Girl in a jacket" width="234px" height="234px">
+                <img class='qr' src="file:///D:/pythonProject/bot/pdftool/qrcodes/id{tid}/id{i.student_id}.png" alt="Girl in a jacket" width="234px" height="234px">
                 <span class="bold">MUASSASA NOMI: </span>{name_s}</br>
                 <span class="bold">BUYURTMA SANASI: </span>{date}</br>
                 <span class="bold">GURUH NOMI: </span>{groupname}</br>
@@ -84,7 +84,7 @@ async def create_title(ids, tid, name_s, date, groupname, second_sub, third_sub,
                 <div class="name">{i.st_fullname.upper()}</div>
 
             </div>
-            <img class="title" src="file:///home/tolibjon/BOT/pythonProject/bot/pdftool/template/hj.png" alt="Girl in a jacket" width="968px" height="488px">
+            <img class="title" src="file:///D:/pythonProject/bot/pdftool/template/hj.png" alt="Girl in a jacket" width="968px" height="488px">
             </div>
             """
             if x%2 != 0:

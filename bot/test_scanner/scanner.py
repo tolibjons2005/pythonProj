@@ -202,7 +202,7 @@ async def test_scanner_func(imgg, session_maker, teacher_id):
 
         # cv2.imshow('dfs', img)
         collums = 3
-        choices = 5
+        choices = 4
 
 
         ###########################################
@@ -280,10 +280,12 @@ async def test_scanner_func(imgg, session_maker, teacher_id):
             print(type(len(myPixelVal[0])))
             print("---------sfgsf-----", np.amax(myPixelVal))
             max_val = np.amax(myPixelVal) - 250.0
-            if max_val > (np.amax(np.amin(np.amax(myPixelVal, axis=2), axis=1))):
-                max_val = 1000.0
-            else:
+            if max_val > (np.amin(myPixelVal)):
                 pass
+            else:
+                max_val = 1000.0
+
+            print(f"-------------------------------------------{max_val}-----------------------------------------------------")
 
             for x in range(0, len(myPixelVal[0])):
                 arr = myPixelVal[0][x]
@@ -295,7 +297,7 @@ async def test_scanner_func(imgg, session_maker, teacher_id):
                     myIndex[0].append(0)
                 else:
                     myIndexVal = np.where(arr == np.amax(arr))
-                    myIndex[0].append(myIndexVal[0][0])
+                    myIndex[0].append(myIndexVal[0][0]+1)
 
             for x in range(0, len(myPixelVal[1])):
                 arr = myPixelVal[1][x]
@@ -307,7 +309,7 @@ async def test_scanner_func(imgg, session_maker, teacher_id):
                     myIndex[1].append(0)
                 else:
                     myIndexVal = np.where(arr == np.amax(arr))
-                    myIndex[1].append(myIndexVal[0][0])
+                    myIndex[1].append(myIndexVal[0][0]+1)
 
             for x in range(0, len(myPixelVal[2])):
                 arr = myPixelVal[2][x]
@@ -319,7 +321,7 @@ async def test_scanner_func(imgg, session_maker, teacher_id):
                     myIndex[2].append(0)
                 else:
                     myIndexVal = np.where(arr == np.amax(arr))
-                    myIndex[2].append(myIndexVal[0][0])
+                    myIndex[2].append(myIndexVal[0][0]+1)
 
             print(myIndex)
 

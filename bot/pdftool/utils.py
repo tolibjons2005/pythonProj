@@ -1,6 +1,6 @@
 import os
 import shutil
-
+import fitz
 import pdfkit
 import jinja2
 
@@ -29,14 +29,14 @@ context = {
 }
 
 
-config = pdfkit.configuration()
+config = pdfkit.configuration(wkhtmltopdf=path_to_wkhtmltopdf)
 template_loader = jinja2.FileSystemLoader('./')
 template_env=jinja2.Environment(loader=template_loader)
 
 
 
-async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids, date, tid, session_maker, t_sub):
-    parent_dir = "/home/tolibjon/BOT/pythonProject/bot/img"
+async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids, date, tid, session_maker, t_sub, book_type):
+    parent_dir = "D:/pythonProject/bot/img"
     directory = f"id{tid}"
 
     # Path
@@ -61,7 +61,7 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
             func_string+=f"""
             $(function(){{
 			var content_height = 1048;	// the height of the content, discluding the header/footer
-			var page = 2;
+			var page = 1;
 			
 
 			
@@ -105,6 +105,24 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
 				}}
 			}}
 			setTimeout(buildNewsletter1{i}, 200);
+		
+			
+			function buildNewsletterrr4{i}(){{
+			
+			if ((0!=((page-1)%4)) && (page-1) != 2){{
+
+			for(var i = 0; i < (4-((page-1)%4)); i++){{
+			
+			 $blank_page=$("#blankkk").clone().css("display", "block");
+
+            $('body').append($blank_page);
+            }}
+									}}
+			
+			}}setTimeout(buildNewsletterrr4{i}, 200);
+			
+			
+		
 
 			
 			}});
@@ -123,7 +141,7 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
 
         # template = template_env.get_template('./pdftool/template/templatecopy.html')
         # context['block1'] = get_string(output_file, test_type)
-        delay= '6000'
+        delay= 1500*len(ids)
     else:
         rown = False
         rown2 = False
@@ -332,7 +350,7 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
         context['date']=date
 
         context['tests'] = tests
-        delay= '15000'
+        delay= 1500*len(ids)
 
 
 
@@ -366,8 +384,269 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
     save_to_io = pdfkit.from_string(output_text,  options=options, configuration=config, css="./pdftool/template/template.css")
 
     # print("--- %s seconds ---" % (time.time() - start_time))
+
+
+    if test_type =='90':
+        if book_type == '2':
+            print(book_type)
+
+            pdf_document = fitz.open(stream=save_to_io, filetype="pdf")
+            pn = pdf_document.page_count
+            sn = len(ids)
+            vbc = sn
+
+            pceb = int(pn / sn)
+            new_pceb = pn / sn
+            print(pceb % 4)
+            if new_pceb % 4 == 0:
+
+                cover_list = ''
+                inner_list = ''
+                hrm = 0
+                for i in range(1, sn + 1):
+
+                    pneb = pceb * i
+                    spneb = pneb + 1 - pceb
+                    # bseb = pneb - int(pceb / 2)
+                    # beeb = bseb + 1
+                    bseb = pceb * vbc - int(pceb / 2)
+                    beeb = bseb + 1
+                    vbc = vbc - 1
+                    while True:
+                        if hrm == 15:
+                            cover_list += f"{pneb},{spneb}"
+
+                            inner_list += f'{bseb},{beeb}'
+                            hrm += 1
+
+                        elif hrm == 16:
+                            cover_list += f"</code>\n\n<code>{pneb},{spneb},"
+
+                            inner_list += f'</code>\n\n<code>{bseb},{beeb},'
+                            hrm = 0
+
+                        else:
+                            cover_list += f"{pneb},{spneb},"
+
+                            inner_list += f'{bseb},{beeb},'
+                            hrm += 1
+
+                        if (pneb - spneb) == 3:
+                            break
+                        pneb = pneb - 2
+                        spneb += 2
+                        bseb = bseb - 2
+                        beeb += 2
+            else:
+                context['tests'] = tests.replace('dontsplit', '')
+                print(tests)
+                delay = '5000'
+                output_text = template.render(context)
+                ism = "Komiljonov Tolibjon"
+                id = "20050617"
+                options = {
+                    # 'quiet': '',
+                    'javascript-delay': delay,
+                    # 'page-size': 'A4',
+                    'page-width': '840px',
+                    'page-height': '1189px',
+
+                    'margin-top': '0px',
+                    'margin-right': '1px',
+                    'margin-bottom': '0px',
+                    'margin-left': '1px',
+                    'zoom': 1,
+                    'no-outline': '',
+                    'disable-smart-shrinking': True,
+                    'enable-local-file-access': '',
+                    'debug-javascript': '',
+                    # 'no-stop-slow-scipts':''
+                    # 'disable-local-file-access': ''
+
+                }
+                # print("--- %s seconds ---" % (time.time() - start_time))
+                # pdfkit.from_string(output_text, output_path=f"{n}", options=options, configuration=config,
+                #                    css="template/template.css")
+
+                save_to_io = pdfkit.from_string(output_text, options=options, configuration=config,
+                                                css="./pdftool/template/template.css")
+
+                pdf_document = fitz.open(stream=save_to_io, filetype="pdf")
+                pn = pdf_document.page_count
+                sn = len(ids)
+                vbc = sn
+
+                pceb = int(pn / sn)
+                cover_list = ''
+                inner_list = ''
+                for i in range(1, sn + 1):
+
+                    pneb = pceb * i
+                    spneb = pneb + 1 - pceb
+                    # bseb = pneb - int(pceb / 2)
+                    # beeb = bseb + 1
+                    bseb = pceb * vbc - int(pceb / 2)
+                    beeb = bseb + 1
+                    vbc = vbc - 1
+                    while True:
+                        cover_list += f"{pneb},{spneb},"
+
+                        inner_list += f'{bseb},{beeb},'
+
+                        if (pneb - spneb) == 3:
+                            break
+                        pneb = pneb - 2
+                        spneb += 2
+                        bseb = bseb - 2
+                        beeb += 2
+
+
+        else:
+            cover_list = 'over'
+            inner_list = ' over'
+    else:
+        if book_type == '2':
+            cover_list = ''
+            inner_list = ''
+            print(book_type)
+
+            pdf_document = fitz.open(stream=save_to_io, filetype="pdf")
+            pn = pdf_document.page_count
+            sn = len(ids)
+            vbc = sn
+
+            pceb = int(pn / sn)
+            new_pceb = pn / sn
+            print(pceb % 4)
+            if new_pceb==2:
+                start_page= 1
+
+                for i in range(1, int(sn/2) + 1):
+                    cover_list += f"{start_page},{start_page+2},"
+                    inner_list += f'{pn},{pn-2},'
+                    start_page=start_page+4
+                    pn=pn-4
+            elif new_pceb % 4 == 0:
+
+                cover_list = ''
+                inner_list = ''
+                hrm = 0
+                for i in range(1, sn + 1):
+
+                    pneb = pceb * i
+                    spneb = pneb + 1 - pceb
+                    # bseb = pneb - int(pceb / 2)
+                    # beeb = bseb + 1
+                    bseb = pceb * vbc - int(pceb / 2)
+                    beeb = bseb + 1
+                    vbc = vbc - 1
+                    while True:
+                        if hrm == 15:
+                            cover_list += f"{pneb},{spneb}"
+
+                            inner_list += f'{bseb},{beeb}'
+                            hrm += 1
+
+                        elif hrm == 16:
+                            cover_list += f"</code>\n\n<code>{pneb},{spneb},"
+
+                            inner_list += f'</code>\n\n<code>{bseb},{beeb},'
+                            hrm = 0
+
+                        else:
+                            cover_list += f"{pneb},{spneb},"
+
+                            inner_list += f'{bseb},{beeb},'
+                            hrm += 1
+
+                        if (pneb - spneb) == 3:
+                            break
+                        pneb = pneb - 2
+                        spneb += 2
+                        bseb = bseb - 2
+                        beeb += 2
+            else:
+                context['tests'] = tests.replace('dontsplit', '')
+                print(tests)
+                delay = '5000'
+                output_text = template.render(context)
+                ism = "Komiljonov Tolibjon"
+                id = "20050617"
+                options = {
+                    # 'quiet': '',
+                    'javascript-delay': delay,
+                    # 'page-size': 'A4',
+                    'page-width': '840px',
+                    'page-height': '1189px',
+
+                    'margin-top': '0px',
+                    'margin-right': '1px',
+                    'margin-bottom': '0px',
+                    'margin-left': '1px',
+                    'zoom': 1,
+                    'no-outline': '',
+                    'disable-smart-shrinking': True,
+                    'enable-local-file-access': '',
+                    'debug-javascript': '',
+                    # 'no-stop-slow-scipts':''
+                    # 'disable-local-file-access': ''
+
+                }
+                # print("--- %s seconds ---" % (time.time() - start_time))
+                # pdfkit.from_string(output_text, output_path=f"{n}", options=options, configuration=config,
+                #                    css="template/template.css")
+
+                save_to_io = pdfkit.from_string(output_text, options=options, configuration=config,
+                                                css="./pdftool/template/template.css")
+
+                pdf_document = fitz.open(stream=save_to_io, filetype="pdf")
+                pn = pdf_document.page_count
+                sn = len(ids)
+                vbc = sn
+
+                pceb = int(pn / sn)
+                cover_list = ''
+                inner_list = ''
+                for i in range(1, sn + 1):
+
+                    pneb = pceb * i
+                    spneb = pneb + 1 - pceb
+                    # bseb = pneb - int(pceb / 2)
+                    # beeb = bseb + 1
+                    bseb = pceb * vbc - int(pceb / 2)
+                    beeb = bseb + 1
+                    vbc = vbc - 1
+                    while True:
+                        cover_list += f"{pneb},{spneb},"
+
+                        inner_list += f'{bseb},{beeb},'
+
+                        if (pneb - spneb) == 3:
+                            break
+                        pneb = pneb - 2
+                        spneb += 2
+                        bseb = bseb - 2
+                        beeb += 2
+
+
+        else:
+            cover_list = 'over'
+            inner_list = ' over'
+
+
     shutil.rmtree(path)
-    return save_to_io
+    return save_to_io, cover_list[:-1], inner_list[:-1]
+
+
+
+
+
+
+
+
+
+    print(cover_list)
+
 
 
 

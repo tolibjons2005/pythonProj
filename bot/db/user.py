@@ -10,7 +10,7 @@ from sqlalchemy.ext.mutable import MutableList
 from .base import BaseModel
 from sqlalchemy.exc import ProgrammingError, IntegrityError, SQLAlchemyError
 
-from sqlalchemy import Column, String, Integer, VARCHAR, select,  ARRAY, BigInteger  # type: ignore
+from sqlalchemy import Boolean,DateTime,Column, String, Integer, VARCHAR, select,  ARRAY, BigInteger,delete  # type: ignore
 
 from sqlalchemy.orm import sessionmaker, relationship, selectinload, load_only  # type: ignore
 from sqlalchemy import update
@@ -27,7 +27,7 @@ class User(BaseModel):
 
     teacher_id = Column(BigInteger, nullable=False)
 
-    st_fullname = Column(VARCHAR(30),  nullable=False)
+    st_fullname = Column(VARCHAR(25),  nullable=False)
 
     t_fullname = Column(VARCHAR(30), nullable=False)
 
@@ -46,10 +46,12 @@ class User(BaseModel):
     st_answers90 = Column(VARCHAR(90), nullable=True)
     st_answers30 = Column(VARCHAR(30), nullable=True)
 
+
     ans_message = Column(String, nullable=True)
     st_score90 = Column(MutableList.as_mutable(ARRAY(Float)), nullable=True)
     st_score30 = Column(MutableList.as_mutable(ARRAY(Float)), nullable=True)
     n_test= Column(VARCHAR(2), nullable=False)
+    is_active = Column(Boolean, default=True)
 
 
     # upd_date = Column(DATE, onupdate=datetime.date.today())
@@ -57,7 +59,116 @@ class User(BaseModel):
     def __str__(self) -> str:
         return f"Users:{self.student_id}>"
 
+class IsPremium(BaseModel):
+    __tablename__ = 'ispremium'
 
+    numer = Column(Integer, primary_key=True, autoincrement=True)
+
+
+    teacher_id = Column(BigInteger,  nullable=False)
+    is_premium = Column(Boolean, default=False)
+    expire_date = Column(DateTime, server_default=func.now(), index=True, nullable=True)
+
+
+
+    # upd_date = Column(DATE, onupdate=datetime.date.today())
+
+    def __str__(self) -> str:
+        return f"Users:{self.teacher_id}>"
+
+async def is_group_active(user_id:int, group_name:str, session_maker:sessionmaker):
+    async with session_maker() as session:
+        async with session.begin():
+            rest = await session.execute(select(User.student_id).where(User.teacher_id == user_id, User.group_name==group_name,  User.is_active == False))
+            rest2 = await session.execute(select(User.student_id).where(User.teacher_id == user_id, User.group_name == group_name))
+            if len(rest.scalars().all()) == len(rest2.scalars().all()):
+                return False
+            else:
+                return True
+
+
+async def premium_checker(user_id:int, session_maker: sessionmaker):
+    async with session_maker() as session:
+        async with session.begin():
+
+            rest = await session.execute(
+                select(IsPremium).where(IsPremium.teacher_id == user_id, IsPremium.is_premium == True))
+            bl = rest.one_or_none()
+            if bl != None:
+                return True
+            return False
+async def expire_date(teacher_id:int, session_maker:sessionmaker):
+    async with session_maker() as session:
+        async with session.begin():
+            expire_dat = datetime.datetime.now()+datetime.timedelta(minutes=1)
+            rest = await session.execute(
+                select(IsPremium).where(IsPremium.teacher_id == teacher_id))
+            bl = rest.one_or_none()
+
+            if bl == None:
+                user = IsPremium(
+
+                    teacher_id=teacher_id,
+                    is_premium=True,
+                    expire_date=expire_dat
+
+                )
+
+                session.add(user)
+            else:
+
+                await session.execute(update(IsPremium).values({'expire_date':expire_dat,
+                                                           'is_premium':True}).where(
+                    IsPremium.teacher_id ==teacher_id))
+                await session.execute(update(User).values({"is_active": True}).where(User.teacher_id == teacher_id))
+            return expire_dat
+
+
+
+async def get_expired_users(session_maker: sessionmaker):
+    datNow=datetime.datetime.now()
+    """
+    Получить пользователя по его id
+    :param user_id:
+    :param session_maker:
+    :return:
+    """
+    async with session_maker() as session:
+
+        async with session.begin():
+
+            teachers_id = await session.execute(
+                select(IsPremium.teacher_id)
+                    .filter(IsPremium.expire_date<datNow)  # type: ignore
+            )
+            await session.execute(update(IsPremium).values({'expire_date': (datetime.datetime.now()+datetime.timedelta(days=365)),'is_premium': False}).where(IsPremium.expire_date<datNow))
+            teachers_id=teachers_id.scalars().all()
+            for tid in teachers_id:
+                result = await session.execute(
+                    select(User.group_name).distinct()
+                    .where(User.teacher_id == tid)  # type: ignore
+                )
+
+                result = result.scalars().all()
+                for r in range(len(result)):
+                    if r <= 1:
+                        print(r)
+                        res = await session.execute(select(User.student_id).where(User.teacher_id == tid,
+                                                                                  User.group_name == result[
+                                                                                      r]).order_by(
+                            User.numer.asc()).offset(15))
+                        res = res.scalars().all()
+                        await session.execute(update(User).values({"is_active": False}).where(User.student_id.in_(res),
+                                                                                              User.group_name == result[
+                                                                                                  r]))
+                    else:
+                        print(r)
+                        await session.execute(
+                            update(User).values({"is_active": False}).where(User.teacher_id == tid,
+                                                                            User.group_name == result[r]))
+
+
+            return teachers_id
 async def get_st_ids(user_id: int,group_name:str, session_maker: sessionmaker) -> User.student_id:
     """
     Получить пользователя по его id
@@ -85,6 +196,20 @@ async def get_group_names(user_id: int, session_maker: sessionmaker) -> User.stu
             result = await session.execute(
                 select(User.group_name).distinct()
                     .filter(User.teacher_id == user_id)  # type: ignore
+            )
+            return result.scalars().all()
+async def count_students(user_id: int,group_name:str, session_maker: sessionmaker) -> User.student_id:
+    """
+    Получить пользователя по его id
+    :param user_id:
+    :param session_maker:
+    :return:
+    """
+    async with session_maker() as session:
+        async with session.begin():
+            result = await session.execute(
+                select(User.student_id).distinct()
+                    .filter(User.teacher_id == user_id, User.group_name == group_name)  # type: ignore
             )
             return result.scalars().all()
 async def get_sub_names(user_id: int, session_maker: sessionmaker) -> User.student_id:
@@ -358,6 +483,13 @@ async def add_ans_message(user_id: int, teacher_id:int, message:str, session_mak
 
        async with session.begin():
            await session.execute(update(User).values({'ans_message':message}).where(User.student_id == user_id, User.teacher_id == teacher_id))
+
+async def delete_student_r(user_id: int, teacher_id:int, session_maker: sessionmaker):
+    async with session_maker() as session:
+
+
+       async with session.begin():
+           await session.execute(delete(User).where(User.student_id == user_id, User.teacher_id == teacher_id))
 async def get_ans_message(user_id: int,subject:str, session_maker: sessionmaker):
     async with session_maker() as session:
         async with session.begin():

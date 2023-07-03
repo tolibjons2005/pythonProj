@@ -104,7 +104,8 @@ def splitBoxes(img, question):
             choices = np.hsplit(r,8)
             del choices[0]
             del choices[0]
-            del choices[5]
+            del choices[0]
+            del choices[4]
             for ch in choices:
                 boxes.append(ch)
 

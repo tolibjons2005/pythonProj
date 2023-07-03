@@ -9,7 +9,7 @@ def create_directory(name):
     directory = f"id{name}"
 
     # Parent Directories
-    parent_dir = "/home/tolibjon/BOT/pythonProject/bot/pdftool/qrcodes"
+    parent_dir = "D:/pythonProject/bot/pdftool/qrcodes"
 
     # Path
     path = os.path.join(parent_dir, directory)
@@ -37,7 +37,7 @@ def create_qr_f(id, name, n, test_type):
     qr.make(fit=True)
 
     img = qr.make_image(fill_color='black', back_color='white')
-    img.save(f'/home/tolibjon/BOT/pythonProject/bot/pdftool/qrcodes/id{name}/id{id}.png')
+    img.save(f'D:/pythonProject/bot/pdftool/qrcodes/id{name}/id{id}.png')
 
 # factory = qrcode.image.svg.SvgPathImage
 # svg_img = qrcode.make('SALOM', image_factory=factory)
