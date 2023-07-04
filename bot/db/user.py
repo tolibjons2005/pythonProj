@@ -42,7 +42,7 @@ class User(BaseModel):
     district = Column(VARCHAR(30),  nullable=False)
 
     region = Column(VARCHAR(30),  nullable=False)
-    group_name = Column(VARCHAR(30), nullable=False)
+    group_name = Column(VARCHAR(25), nullable=False)
     st_answers90 = Column(VARCHAR(90), nullable=True)
     st_answers30 = Column(VARCHAR(30), nullable=True)
 
@@ -75,6 +75,48 @@ class IsPremium(BaseModel):
 
     def __str__(self) -> str:
         return f"Users:{self.teacher_id}>"
+
+class StarterDB(BaseModel):
+    __tablename__ = 'starterdb'
+
+    numer = Column(Integer, primary_key=True, autoincrement=True)
+
+
+    user_id = Column(BigInteger,  nullable=False)
+    user_fullname = Column(VARCHAR(30), nullable=True)
+    user_uname = Column(VARCHAR(30), nullable=True)
+
+
+
+    # upd_date = Column(DATE, onupdate=datetime.date.today())
+
+    def __str__(self) -> str:
+        return f"Users:{self.user_id}>"
+
+async def wr_starter_db(user_id:int, session_maker:sessionmaker,user_fullname=None, user_uname=None ):
+    async with session_maker() as session:
+        async with session.begin():
+
+            rest = await session.execute(
+                select(StarterDB).where(StarterDB.user_id == user_id))
+            bl = rest.one_or_none()
+
+            if bl == None:
+                user = StarterDB(
+
+                    user_id=user_id,
+                    user_fullname=user_fullname,
+                    user_uname=user_uname
+
+                )
+
+                session.add(user)
+            else:
+
+                await session.execute(update(StarterDB).values({'user_fullname':user_fullname,
+                                                           'user_uname':user_uname}).where(
+                   StarterDB.user_id ==user_id))
+
 
 async def is_group_active(user_id:int, group_name:str, session_maker:sessionmaker):
     async with session_maker() as session:

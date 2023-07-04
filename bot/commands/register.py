@@ -21,7 +21,7 @@ from aiogram import html
 from aiogram import Bot
 
 
-from db.user import  is_group_active,premium_checker,get_expired_users,expire_date,create_user, get_st_ids, get_st_datas, add_answers, get_group_names, add_score, get_st_scores, \
+from db.user import  wr_starter_db,is_group_active,premium_checker,get_expired_users,expire_date,create_user, get_st_ids, get_st_datas, add_answers, get_group_names, add_score, get_st_scores, \
      get_st_dats, get_ans_message, get_sub_names, get_t_sub, count_students, delete_student_r
 from pdftool.utils import create_pdf
 
@@ -72,7 +72,9 @@ async def result_msg(call: types.CallbackQuery, state: FSMContext,bot:Bot, sessi
     result = await get_ans_message(call.from_user.id,call.data[4:], session_maker)
     await call.message.answer(result.replace('%^', "\n"), parse_mode="HTML")
     await student_menu(call, state, bot, call.from_user.id)
-async def tutorial(message: types.Message, state: FSMContext):
+async def tutorial(message: types.Message, state: FSMContext, session_maker: sessionmaker):
+    await wr_starter_db(message.from_user.id, session_maker, message.from_user.full_name, message.from_user.username)
+
     await message.answer(f"Assalomu alaykum, {message.from_user.full_name}, boshlashdan oldin iltimos qo‘llanma bilan yaxshilab tanishib chiqing", reply_markup=clear, parse_mode="HTML")
     await state.set_state(Registration.tutorial)
     #await state.set_state(PostRegistration.menu)
@@ -684,13 +686,13 @@ async def select_group_name_callback(call: types.CallbackQuery, session_maker: s
         builder.add(types.InlineKeyboardButton(text=i, callback_data=f'gr_{i}'))
     builder.adjust(1)
 
-    await call.message.answer("Guruhni tanlang:", reply_markup=builder.as_markup())
+    await call.message.answer("Guruhni tanlang:", reply_markup=builder.as_markup(),  cache_time=1)
 async def select_test_type(call: types.CallbackQuery, state: FSMContext, session_maker: sessionmaker):
     await state.update_data(groupn=call.data[3:])
     bool=await is_group_active(call.from_user.id, call.data[3:], session_maker)
     print(bool)
     if bool:
-        await call.message.edit_text('Test shaklini tanlang:', reply_markup=test_type)
+        await call.message.edit_text('Test shaklini tanlang:', reply_markup=test_type,  cache_time=1)
     else:
         await call.message.edit_text(f'{call.data[3:]} ushbu guruh Premium tarifi muddati tugagani uchun inaktiv holatga o‘tkazilgan.\n\n'
                                      f' Guruhni aktiv holatga o‘tkazib undan foydalanish  uchun yana Premium tarifini faollashtirishingiz kerak. '
@@ -719,16 +721,16 @@ async def select_test_type(call: types.CallbackQuery, state: FSMContext, session
 async def select_book_type(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(test_type=call.data[-2:])
     if call.data[-2:] == '90':
-        await call.message.edit_text('Test kitobchasi shaklini tanlang:', reply_markup=k_select_book_type)
+        await call.message.edit_text('Test kitobchasi shaklini tanlang:', reply_markup=k_select_book_type,  cache_time=1)
     else:
-        await call.message.edit_text('Test kitobchasi shaklini tanlang:', reply_markup=k_select_book_type30)
+        await call.message.edit_text('Test kitobchasi shaklini tanlang:', reply_markup=k_select_book_type30,  cache_time=1)
 async def send_file(call: types.CallbackQuery, state: FSMContext):
-    await call.message.answer("Testni namunada ko‘rsatilganidek shaklda jo‘nating va uyog‘ini bizga qo‘yib bering😊", reply_markup=back_2_menu)
+    await call.message.answer("Testni namunada ko‘rsatilganidek shaklda jo‘nating va uyog‘ini bizga qo‘yib bering😊", reply_markup=back_2_menu,  cache_time=1)
     await state.set_state(PostRegistration.send_file)
     await state.update_data(bok_type=call.data[5:])
 
 async def send_file30(call: types.CallbackQuery, state: FSMContext):
-    await call.message.answer("Testni namunada ko‘rsatilganidek shaklda jo‘nating va uyog‘ini bizga qo‘yib bering😊", reply_markup=back_2_menu)
+    await call.message.answer("Testni namunada ko‘rsatilganidek shaklda jo‘nating va uyog‘ini bizga qo‘yib bering😊", reply_markup=back_2_menu,  cache_time=1)
     await state.set_state(PostRegistration.send_file)
     await state.update_data(bok_type=call.data[7:])
 
@@ -839,8 +841,9 @@ async def get_stats(call: types.CallbackQuery,state: FSMContext, session_maker: 
     # res = np.average(res)
 
     await call.message.edit_text(res, parse_mode="HTML")
-    await call.message.answer(f'Kerakli bo‘limni tanlang')
     await state.set_state(PostRegistration.menu)
+    await call.message.answer(f'Kerakli bo‘limni tanlang')
+    
 async def register_back(message: types.Message, state: FSMContext, bot: Bot, session_maker: sessionmaker):
     state_name = await state.get_state()
     if state_name == 'Registration:register_school_name':

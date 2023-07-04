@@ -194,11 +194,13 @@ text-align: center;
 	font-family: bitter;
 	font-style:italic;
 }
-
+.linktree{
+margin-top:270px;
+margin-left:70px;}
 .footer1{
 
 
-	margin-top:420px;
-	margin-left:70px;
+	margin-top:10px;
+	margin-left:81px;
 }
 .imj{ clear: both; width:250px;}

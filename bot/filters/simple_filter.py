@@ -23,7 +23,9 @@ class IsRegistered(BaseFilter):
         # # Если юзернеймы есть, то "проталкиваем" их в хэндлер
         # # по имени "usernames"
         state_name=await state.get_state()
-        if state_name.startswith('PostRegistration') and message.text=="/start":
-            return True
+        if state_name:
+            if state_name.startswith('PostRegistration') and message.text == "/start":
+                return True
+
         # Если не нашли ни одного юзернейма, вернём False
         return False

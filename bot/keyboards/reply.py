@@ -67,7 +67,7 @@ slct_role = ReplyKeyboardMarkup(
 
 
     [KeyboardButton(text="Bo‘lajak talaba👨‍🎓👩‍🎓")],
-[KeyboardButton(text="Ortga qaytish🔙")]
+
 ], resize_keyboard=True )
 student_key = ReplyKeyboardMarkup(
     keyboard=[
