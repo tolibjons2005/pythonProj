@@ -4,17 +4,18 @@ from enum import unique
 import numpy as np
 import sqlalchemy
 from asyncpg import UniqueViolationError
-from sqlalchemy import literal_column, Float, func
+from sqlalchemy import literal_column, Float, func, bindparam
 from sqlalchemy.ext.mutable import MutableList
 
 from .base import BaseModel
 from sqlalchemy.exc import ProgrammingError, IntegrityError, SQLAlchemyError
 
-from sqlalchemy import Boolean,DateTime,Column, String, Integer, VARCHAR, select,  ARRAY, BigInteger,delete  # type: ignore
+from sqlalchemy import Boolean,DateTime,Column, String, Integer, VARCHAR, select,  ARRAY, BigInteger,delete, JSON,insert  # type: ignore
 
 from sqlalchemy.orm import sessionmaker, relationship, selectinload, load_only  # type: ignore
 from sqlalchemy import update
 from aiogram import html
+from sqlalchemy.sql.expression import text
 
 
 class User(BaseModel):
@@ -23,26 +24,26 @@ class User(BaseModel):
     numer = Column(Integer, primary_key=True, autoincrement=True)
 
 
-    student_id = Column(BigInteger,  nullable=False)
+    student_id = Column(BigInteger,  nullable=True)
 
-    teacher_id = Column(BigInteger, nullable=False)
+    teacher_id = Column(BigInteger, nullable=True)
 
-    st_fullname = Column(VARCHAR(25),  nullable=False)
+    st_fullname = Column(VARCHAR(25),  nullable=True)
 
-    t_fullname = Column(VARCHAR(30), nullable=False)
+    t_fullname = Column(VARCHAR(30), nullable=True)
 
-    teacher_subject = Column(VARCHAR(30), nullable=False)
+    teacher_subject = Column(VARCHAR(30), nullable=True)
 
-    school_name = Column(VARCHAR(60), nullable=False)
+    school_name = Column(VARCHAR(60), nullable=True)
 
-    subject_1 = Column(VARCHAR(28), nullable=False)
+    subject_1 = Column(VARCHAR(28), nullable=True)
 
-    subject_2 = Column(VARCHAR(28), nullable=False)
+    subject_2 = Column(VARCHAR(28), nullable=True)
 
-    district = Column(VARCHAR(30),  nullable=False)
+    district = Column(VARCHAR(30),  nullable=True)
 
-    region = Column(VARCHAR(30),  nullable=False)
-    group_name = Column(VARCHAR(25), nullable=False)
+    region = Column(VARCHAR(30),  nullable=True)
+    group_name = Column(VARCHAR(25), nullable=True)
     st_answers90 = Column(VARCHAR(90), nullable=True)
     st_answers30 = Column(VARCHAR(30), nullable=True)
 
@@ -50,7 +51,7 @@ class User(BaseModel):
     ans_message = Column(String, nullable=True)
     st_score90 = Column(MutableList.as_mutable(ARRAY(Float)), nullable=True)
     st_score30 = Column(MutableList.as_mutable(ARRAY(Float)), nullable=True)
-    n_test= Column(VARCHAR(2), nullable=False)
+    n_test= Column(VARCHAR(2), nullable=True)
     is_active = Column(Boolean, default=True)
 
 
@@ -74,7 +75,7 @@ class IsPremium(BaseModel):
     # upd_date = Column(DATE, onupdate=datetime.date.today())
 
     def __str__(self) -> str:
-        return f"Users:{self.teacher_id}>"
+        return f"Users:{self.user_id}>"
 
 class StarterDB(BaseModel):
     __tablename__ = 'starterdb'
@@ -88,10 +89,214 @@ class StarterDB(BaseModel):
 
 
 
+
+
+
     # upd_date = Column(DATE, onupdate=datetime.date.today())
 
     def __str__(self) -> str:
         return f"Users:{self.user_id}>"
+
+class DbForOnlineTest(BaseModel):
+    __tablename__ = 'onlinetestdb'
+
+    numer = Column(Integer, primary_key=True, autoincrement=True)
+
+
+    teacher_id = Column(BigInteger,  nullable=True)
+    st_answers90 = Column(VARCHAR(90), nullable=True)
+    st_answers30 = Column(VARCHAR(30), nullable=True)
+    subject_1 = Column(VARCHAR(28), nullable=True)
+
+    subject_2 = Column(VARCHAR(28), nullable=True)
+    expire_date = Column(DateTime, server_default=func.now(), index=True, nullable=True)
+    data = Column(JSON, nullable=True)
+
+
+
+
+
+    # upd_date = Column(DATE, onupdate=datetime.date.today())
+
+    def __str__(self) -> str:
+        return f"Users:{self.teacher_id}>"
+
+
+async def get_online_stats(teacher_id:int,session_maker:sessionmaker):
+    async with session_maker() as session:
+        async with session.begin():
+
+
+            users=await session.execute(
+                    select(DbForOnlineTest.data).where(DbForOnlineTest.teacher_id==teacher_id))
+            students=users.scalars().first()
+            rest = await session.execute(
+                select(IsPremium).where(IsPremium.teacher_id == teacher_id, IsPremium.is_premium == True))
+            bl = rest.one_or_none()
+            if students ==None or students=={}:
+                return 2
+            elif bl == None:
+                return 1
+            else:
+                user_list = [(key, *value.split("%")) for key, value in students.items()]
+
+                sorted_users = sorted(user_list, key=lambda x: (-float(x[1]), x[3]))
+
+                return sorted_users
+
+
+
+async def register_student_fof(student_id:int,st_fullname:str, session_maker:sessionmaker):
+    async with session_maker() as session:
+        async with session.begin():
+            user = User(
+                teacher_id=5,
+                student_id=student_id,
+                st_fullname=st_fullname
+
+
+            )
+            session.add(user)
+
+async def can_i_use(teacher_id:int,test_type:str,session_maker:sessionmaker):
+    async with session_maker() as session:
+        async with session.begin():
+            if test_type == '90':
+                rest = await session.execute(
+                    select(DbForOnlineTest.st_answers90, DbForOnlineTest.data).where(DbForOnlineTest.teacher_id==teacher_id))
+                bl=rest.one_or_none()
+
+                if bl.st_answers90 == None:
+                    return False, bl.data
+                else:
+                    return True, bl.data
+            else:
+                rest = await session.execute(
+                    select(DbForOnlineTest.st_answers30, DbForOnlineTest.data).where(DbForOnlineTest.teacher_id == teacher_id))
+
+                bl = rest.one_or_none()
+                print(bl.data)
+
+                if bl.st_answers30 == None:
+
+                    return False, bl.data
+                else:
+                    return True, bl.data
+
+
+async def is_registered(student_id:int,session_maker:sessionmaker):
+    async with session_maker() as session:
+        async with session.begin():
+            rest = await session.execute(
+                select(User.teacher_id).where(User.student_id == student_id).order_by(User.numer.desc()))
+
+            bl=rest.scalars().first()
+
+            if bl!=None and bl >0:
+                print(bl)
+                return 2
+            elif bl!=None and bl==0:
+                return 1
+            else:
+                return 0
+
+
+async def get_schname_tsub(teacher_id:int, session_maker: sessionmaker):
+    async with session_maker() as session:
+        async with session.begin():
+            result = await session.execute(
+                select(User).options(load_only(User.school_name, User.teacher_subject))
+                    .filter(User.teacher_id == teacher_id)  # type: ignore
+            )
+            return result.scalars().first()
+async def get_answers_oo(teacher_id:int,test_type:str, session_maker:sessionmaker, student_id:int):
+    datNow = datetime.datetime.now()
+    async with session_maker() as session:
+        async with session.begin():
+            ti_res=await session.execute(
+                select(User).where(User.student_id == student_id).order_by(User.numer.desc()))
+            tid_res = ti_res.scalars().first()
+            if tid_res.teacher_id <6:
+                n=tid_res.teacher_id-1
+                await session.execute(update(User).values(
+                    {'teacher_id': n}).where(
+                    User.student_id== student_id))
+
+
+            if test_type == '90':
+                result = await session.execute(
+                    select(DbForOnlineTest).options(load_only(DbForOnlineTest.st_answers90,  DbForOnlineTest.subject_1, DbForOnlineTest.subject_2, DbForOnlineTest.data, ))
+                    .filter(DbForOnlineTest.teacher_id == teacher_id,DbForOnlineTest.expire_date>datNow)  # type: ignore
+                )
+            elif test_type == '30':
+                result = await session.execute(
+                    select(DbForOnlineTest).options(load_only(DbForOnlineTest.st_answers30,DbForOnlineTest.data))
+                    .filter(DbForOnlineTest.teacher_id == teacher_id,DbForOnlineTest.expire_date>datNow)  # type: ignore
+                )
+
+            return result.scalars().one(), tid_res.st_fullname
+async def add_to_ONLINE(teacher_id:int,answer:str, expire_date:list,session_maker:sessionmaker,subject_1=None,subject_2=None):
+    async with session_maker() as session:
+        async with session.begin():
+            if expire_date[0]==0 and expire_date[1]==0:
+                expd = datetime.datetime.now() + datetime.timedelta(days=365)
+
+                epd=None
+            else:
+                expd=datetime.datetime.now()+datetime.timedelta(hours=expire_date[0], minutes=expire_date[1])
+
+            rest = await session.execute(
+                select(DbForOnlineTest).where(DbForOnlineTest.teacher_id == teacher_id))
+            bl = rest.one_or_none()
+
+            if bl == None:
+                if len(answer)==90:
+                    user = DbForOnlineTest(
+                        teacher_id=teacher_id,
+                        st_answers90= answer,
+                        expire_date=expd,
+                        subject_1=subject_1,
+                        subject_2=subject_2
+
+
+                    )
+                    session.add(user)
+                else:
+                    user = DbForOnlineTest(
+                        teacher_id=teacher_id,
+                        st_answers30=answer,
+                        expire_date=expd
+
+                    )
+                    session.add(user)
+            else:
+                if len(answer)==90:
+                    await session.execute(update(DbForOnlineTest).values({'st_answers90': answer, 'st_answers30': None,"expire_date":expd, "subject_1": subject_1, "subject_2":subject_2, "data":{}}).where(DbForOnlineTest.teacher_id == teacher_id))
+                else:
+                    await session.execute(update(DbForOnlineTest).values({'st_answers30': answer, 'st_answers90': None,"expire_date":expd, "data":{}}).where(
+                        DbForOnlineTest.teacher_id == teacher_id))
+            return epd
+
+
+
+
+
+async def add_to_dict(teacher_id:int,st_id:int,score:str,session_maker:sessionmaker):
+    async with session_maker() as session:
+        async with session.begin():
+
+            row = await session.execute(select(DbForOnlineTest).where(DbForOnlineTest.teacher_id == teacher_id))
+            my_table = row.scalar_one()
+
+            # Modify the JSONB data
+            data = my_table.data or {}
+            print(len(data))
+            data[f'{st_id}'] = score
+
+            # Update the row with the modified JSONB data
+            await session.execute(update(DbForOnlineTest).where(DbForOnlineTest.teacher_id == teacher_id).values(data=data))
+
+
 
 async def wr_starter_db(user_id:int, session_maker:sessionmaker,user_fullname=None, user_uname=None ):
     async with session_maker() as session:
@@ -539,12 +744,13 @@ async def get_ans_message(user_id: int,subject:str, session_maker: sessionmaker)
                 select(User.ans_message)
                 .filter(User.student_id == user_id, User.t_fullname == subject)  # type: ignore
             )
+            bl=result.scalars().first()
 
                 
-            if result != None:
-                return result.scalars().one()
+            if bl != None:
+                return print(bl)
             else:
-                return "Test tekshirilmagan"
+                return "Hali bironta ham siz tomoningizdan ishlangan test tekshirilmagan"
 
 # async def increase_n_test(user_id: int, session_maker: sessionmaker):
 #     async with session_maker() as session:

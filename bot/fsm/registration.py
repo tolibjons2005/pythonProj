@@ -23,5 +23,16 @@ class PostRegistration(StatesGroup):
     register_students_new = State()
     delete_students = State()
     post_new_gr = State()
+    set_hour= State()
+    set_minute= State()
+    select_on_test_type = State()
+    send_file_on= State()
+    select_enter_channel_link=State()
+    detect_on_subject= State()
 
-
+class StudentMenu(StatesGroup):
+    get_code = State()
+    select_m_check_online = State()
+    scan_omr=State()
+    enter_test=State()
+    start_own_register=State()

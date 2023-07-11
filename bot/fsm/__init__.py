@@ -1,2 +1,2 @@
-from fsm.registration import Registration, PostRegistration
-__all__ = ('Registration', 'PostRegistration')
+from fsm.registration import Registration, PostRegistration,StudentMenu
+__all__ = ('Registration', 'PostRegistration','StudentMenu')

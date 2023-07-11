@@ -195,12 +195,48 @@ text-align: center;
 	font-style:italic;
 }
 .linktree{
-margin-top:270px;
-margin-left:70px;}
+}
 .footer1{
+text-align:center;
+
 
 
 	margin-top:10px;
-	margin-left:81px;
+
+}
+.footer1, .channel_link{
+text-align:center;
+
+
+
+	margin-top:10px;
+
+}
+.cardlink{
+float:left;
+margin-top:250px;
+margin-left:70px;
+}
+.chanlink{
+float:right;
+margin-top:250px;
+margin-right:70px;
+}
+.channel_link_img{
+
 }
 .imj{ clear: both; width:250px;}
+
+.nameClass{
+margin-top: 80px;
+font-size:15px;
+font-family: bitter;
+font-style: italic;
+
+}
+.nameClass hr{
+width: 500px;
+}
+.nameClass p{
+margin-top:15px;
+text-align:center;}

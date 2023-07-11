@@ -3,8 +3,6 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardBut
 #     [KeyboardButton(text='Press')]
 # ], resize_keyboard=True )
 
-# clear =ReplyKeyboardMarkup([[KeyboardButton(text="O‘rganib chiqdim")]], resize_keyboard=True )
-
 clear = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text='O‘rganib chiqdim'), ],
@@ -31,7 +29,7 @@ back_2_menu = ReplyKeyboardMarkup(keyboard=[
 end_register = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text="Davom etish⏩")]
 ], resize_keyboard=True )
-menu = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Test yaratish📝"),KeyboardButton(text="Natijalarni tekshirish✅❌")], [KeyboardButton(text="Ma'lumotlarni tahrirlash✏️")], [KeyboardButton(text="Statistika📊")]], resize_keyboard=True)
+menu = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Onlayn uchun test yaratish📝")],[KeyboardButton(text="Test yaratish📝"),KeyboardButton(text="Natijalarni tekshirish✅❌")], [KeyboardButton(text="Ma'lumotlarni tahrirlash✏️")], [KeyboardButton(text="Statistika📊")],[KeyboardButton(text="Onlayn test natijasini olish🧾")]], resize_keyboard=True)
 end = ReplyKeyboardMarkup(
     keyboard=[
     [KeyboardButton(text="Qo‘shishni yakunlash")],
@@ -61,6 +59,17 @@ edit_menu = ReplyKeyboardMarkup(
     [KeyboardButton(text="Asosiy menyuga qaytish🔙")],
 
 ], resize_keyboard=True )
+method_of_checking= ReplyKeyboardMarkup(
+    keyboard=[
+    [KeyboardButton(text="Rasmga olish orqali tekshirish📸")],
+
+[KeyboardButton(text="Qo‘lda kiritish orqali tekshirish")],
+
+
+
+    [KeyboardButton(text="Ortga qaytish🔙")],
+
+], resize_keyboard=True )
 slct_role = ReplyKeyboardMarkup(
     keyboard=[
     [KeyboardButton(text="Ustoz👨‍🏫👩‍🏫")],
@@ -71,6 +80,7 @@ slct_role = ReplyKeyboardMarkup(
 ], resize_keyboard=True )
 student_key = ReplyKeyboardMarkup(
     keyboard=[
+[KeyboardButton(text="Onlayn test natijasini tekshirish✅❌")],
     [KeyboardButton(text="Ohirgi natijani ko‘rish")],
 
 
@@ -407,8 +417,8 @@ k_regions =InlineKeyboardMarkup(inline_keyboard=regions)
 
 
 select_subject_degree =[
-[InlineKeyboardButton(text="1 chi fan", callback_data="first_subject")],
-[InlineKeyboardButton(text="2 chi fan", callback_data="second_subject")],
+[InlineKeyboardButton(text="1 chi darajali fan", callback_data="first_subject")],
+[InlineKeyboardButton(text="2 chi darajali fan", callback_data="second_subject")],
 [InlineKeyboardButton(text="Ortga qaytish🔙", callback_data="detect_back")]
 ]
 
