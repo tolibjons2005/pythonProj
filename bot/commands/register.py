@@ -1,5 +1,6 @@
 import asyncio
 import re
+from typing import Union
 
 from aiogram import types
 from aiogram.filters import CommandObject
@@ -134,26 +135,26 @@ async def enter_channel_link(message:types.Message, state:FSMContext):
         await message.answer(
             'Daqiqa xato kiritildi.\n\n<i>Daqiqani faqat raqamlarda qaytadan kiriting</i>',
             parse_mode="HTML")
-async def select_on_test_type(message:types.Message|types.CallbackQuery, state:FSMContext):
-    try:
-        pattern = '^(t\.me\/)....+'
-        result = re.match(pattern, message.text)
-        if result:
-            await state.update_data(channel_link=message.text)
+async def select_on_test_type(message:Union[types.Message,types.CallbackQuery], state:FSMContext):
+    # try:
+    pattern = '^(t\.me\/)....+'
+    result = re.match(pattern, message.text)
+    if result:
+        await state.update_data(channel_link=message.text)
 
-            await message.answer(
-                '<i>Onlayn test olish uchun test shaklini tanlang:</i>',
-                parse_mode="HTML", reply_markup=await new_test_type())
-            await state.set_state(PostRegistration.select_on_test_type)
-        else:
-            await message.answer(
-                'Kanal linki xato kiritildi.\n\n<i>Kanal linkini t.me/kanalingiz_uzerneymi shu shaklda qaytadan kiriting</i>',
-                parse_mode="HTML")
-    except:
-        await message.message.answer(
+        await message.answer(
             '<i>Onlayn test olish uchun test shaklini tanlang:</i>',
             parse_mode="HTML", reply_markup=await new_test_type())
         await state.set_state(PostRegistration.select_on_test_type)
+    else:
+        await message.answer(
+            'Kanal linki xato kiritildi.\n\n<i>Kanal linkini t.me/kanalingiz_uzerneymi shu shaklda qaytadan kiriting</i>',
+            parse_mode="HTML")
+    # except:
+    #     await message.message.answer(
+    #         '<i>Onlayn test olish uchun test shaklini tanlang:</i>',
+    #         parse_mode="HTML", reply_markup=await new_test_type())
+    #     await state.set_state(PostRegistration.select_on_test_type)
 
 
 async def detect_sub_fo(call: types.CallbackQuery,state:FSMContext, session_maker:sessionmaker):
@@ -456,7 +457,7 @@ async def check_inline_response(call: types.CallbackQuery, callback_data: Choose
 
     await state.set_state(Registration.show_res)
 
-async def student_menu(messag: types.Message|types.CallbackQuery, state: FSMContext,bot: Bot, id: int = None):
+async def student_menu(messag: Union[types.Message,types.CallbackQuery], state: FSMContext,bot: Bot, id: int = None):
 
     if not id:
         await messag.answer("O‘zingizga kerakli bo‘lgan menyuni tanlang", reply_markup=student_key)
@@ -629,7 +630,7 @@ async def register_group_name(call: types.CallbackQuery,state: FSMContext):
         reply_markup=await back('20-02'))
     await state.set_state(Registration.register_group_name)
 
-async def register_new_group_name(message: types.Message|types.CallbackQuery, state: FSMContext, session_maker: sessionmaker, bot: Bot) :
+async def register_new_group_name(message: Union[types.Message,types.CallbackQuery], state: FSMContext, session_maker: sessionmaker, bot: Bot) :
 
 
     try:
@@ -713,7 +714,7 @@ async def detect_subject(message: types.Message,state: FSMContext, bot: Bot):
 
 
 
-async def new_detect_subject(message: types.Message|types.CallbackQuery,state: FSMContext, bot: Bot, session_maker: sessionmaker):
+async def new_detect_subject(message: Union[types.Message,types.CallbackQuery],state: FSMContext, bot: Bot, session_maker: sessionmaker):
     user_data = await state.get_data()
     t_subject = user_data['t_subject']
 
