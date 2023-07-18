@@ -1,0 +1,96 @@
+@font-face {
+	font-family: Montserrat;
+	src: url(file:///D:/pythonProject/montserrat/Regular.ttf);
+	font-weight: normal;
+  }
+
+ @font-face {
+    font-family: Montserrat;
+	src: url(file:///D:/pythonProject/montserrat/Medium.ttf);
+	font-weight: 500;
+  }
+
+ @font-face {
+	font-family: Montserrat;
+	src: url(file:///D:/pythonProject/montserrat/SemiBold.ttf);
+	font-weight: 600;
+  }
+
+body{
+    font-family: Montserrat;
+    letter-spacing: 0.02em;
+    color: #272727;
+
+    }
+
+
+
+
+.up_block{
+display:block;
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+.list_of_data{
+    display: block;
+    font-size: 24px;
+    line-height: 39px;
+
+    height: 234px;
+    width: 968px;
+    margin-left: 111px;
+}
+
+.name{
+    
+    font-size: 40px;
+
+}
+.qr{
+    float:right;
+
+
+}
+
+.name{
+    display: block;
+    margin-top: 45px;
+    font-size: 40px;
+    
+}
+.title{
+    display:inline;
+    margin-left: 111px;
+    margin-top: 20px;
+
+
+
+}
+
+
+.bold{
+    font-family: Montserrat;
+    font-weight:500;
+
+
+}
+
+.name{
+    font-family: Montserrat;
+    font-weight:600;
+    letter-spacing: 0.05em;
+
+}
+hr{
+border: 1px dashed black;}
