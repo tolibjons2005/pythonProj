@@ -4,8 +4,8 @@ __all__ = ['register_user_commands', 'bot_commands']
 from aiogram import Router
 from aiogram.filters.command import CommandStart
 from aiogram.types import ContentType
-from filters.simple_filter import IsRegistered
-from commands.register import get_ststs_on, select_on_test_type,get_fullname_fo,check_inline_response,get_test_code,OMR_checking,about_OMR_checking,check_online_test,enter_channel_link, get_file_on,select_on_test_type,enter_minute,create_ot,send_file_fo30,send_file_fo90,detect_sub_fo,confirm_answer,next_page,retry_answer,test_fabric, test_hand,select_group_name_callback,remove_from_premium, testsch,send_file, register_group_name, detect_subject, select_subject, \
+from filters.simple_filter import IsRegistered,IsRegisteredNot
+from commands.register import upload_photo,get_ststs_on, select_on_test_type,get_fullname_fo,check_inline_response,get_test_code,OMR_checking,about_OMR_checking,check_online_test,enter_channel_link, get_file_on,select_on_test_type,enter_minute,create_ot,send_file_fo30,send_file_fo90,detect_sub_fo,confirm_answer,next_page,retry_answer,test_fabric, test_hand,select_group_name_callback,remove_from_premium, testsch,send_file, register_group_name, detect_subject, select_subject, \
     tutorial, register_t_name, registered_menu, register_school_name, register_subject, register_students, \
     about_register_students, register_back, get_file, scan_test, register_region, register_district, callback_back, \
     reg_menu, about_scan_test, select_group_name,  edit_add_students, edit_datas, get_stats, select_role, student_menu, result_msg, select_sub_name, register_new_group_name, \
@@ -22,11 +22,16 @@ bot_commands = (('start', 'Start  starts', 'Start  starts bot'),
 
 
 def register_user_commands(router: Router) -> None:
+    router.message.register(upload_photo, F.photo)
     router.message.register(register_subject, F.text == 'Ortga qaytish🔙', Registration.register_group_name)
     router.message.register(register_back, F.text == "Ortga qaytish🔙")
     router.message.register(reg_menu, IsRegistered())
     router.message.register(tutorial, CommandStart())
     router.message.register(get_fullname_fo, StudentMenu.start_own_register)
+    router.message.register(edit_datas, IsRegisteredNot('Ma\'lumotlarni tahrirlash✏️'))
+    router.message.register(select_group_name, IsRegisteredNot('Statistika📊'))
+    router.message.register(select_group_name,IsRegisteredNot('Test yaratish📝'))
+    router.message.register(about_scan_test, IsRegisteredNot('Natijalarni tekshirish✅❌'))
 
     # router.message.register(test_hand, CommandStart())
     router.callback_query.register(test_fabric, ChoosesCallbackFactory.filter(F.action=='select'))
@@ -69,10 +74,7 @@ def register_user_commands(router: Router) -> None:
     router.message.register(edit_datas, F.text == 'Qo‘shishni yakunlash',  PostRegistration.register_students_new)
     router.message.register(edit_datas, F.text == 'O‘chirishni yakunlash', PostRegistration.delete_students)
     router.message.register(edit_datas, F.text == 'Qo‘shishni yakunlash', PostRegistration.add_students)
-    router.message.register(edit_datas, F.text == 'Ma\'lumotlarni tahrirlash✏️', PostRegistration.menu)
-    router.message.register(select_group_name, F.text == 'Statistika📊', PostRegistration.menu)
-    router.message.register(select_group_name,F.text=='Test yaratish📝', PostRegistration.menu)
-    router.message.register(about_scan_test, F.text=='Natijalarni tekshirish✅❌', PostRegistration.menu)
+
     router.message.register(delete_students,PostRegistration.delete_students)
 
     router.callback_query.register(edit_add_students, F.data.startswith('gr_'),PostRegistration.edit_datas)

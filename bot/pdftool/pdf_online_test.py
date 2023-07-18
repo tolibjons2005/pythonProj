@@ -1,6 +1,6 @@
 import os
 import shutil
-import fitz
+
 import pdfkit
 import jinja2
 import PyPDF2
@@ -138,7 +138,7 @@ async def create_pdf_on(output_file, test_type, second_sub, third_sub,expire_dat
 
 """
         context['functions'] = func_string
-        context['tests'] = tests
+        context['tests'] = tests.replace('\\frac','\\dfrac')
         context['name_s'] = name_s
         context['channel_link'] = channel_link
         context['teacher_id'] = '30'+str(tid)
@@ -173,7 +173,7 @@ async def create_pdf_on(output_file, test_type, second_sub, third_sub,expire_dat
 
 
 
-        await add_to_ONLINE(tid, answ, expire_date, session_maker, subject_1=second_sub, subject_2=third_sub)
+        epd=await add_to_ONLINE(tid, answ, expire_date, session_maker, subject_1=second_sub.replace(' ','_'), subject_2=third_sub.replace(' ','_'))
 
         func_string += f"""
         $(function(){{
@@ -343,7 +343,7 @@ async def create_pdf_on(output_file, test_type, second_sub, third_sub,expire_dat
 
         context['date'] = date
 
-        context['tests'] = tests
+        context['tests'] = tests.replace('\\frac','\\dfrac')
         p_height='1189px'
         delay = 2500
 
@@ -377,4 +377,4 @@ async def create_pdf_on(output_file, test_type, second_sub, third_sub,expire_dat
 
 
     shutil.rmtree(path)
-    return save_to_io
+    return save_to_io, epd

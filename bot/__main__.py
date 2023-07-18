@@ -9,7 +9,8 @@ from aiogram.types import BotCommand
 # from aioredis import Redis
 from sqlalchemy.engine import URL
 from dotenv import load_dotenv
-from aioredis import Redis
+from redis import asyncio as aioredis
+
 from arq import create_pool
 from config import conf
 
@@ -28,7 +29,7 @@ async def main() -> None:
     for cmd in bot_commands:
         commands_for_bot.append(BotCommand(command=cmd[0], description=cmd[1]))
 
-    redis = Redis().from_url('redis://default:4ZxLzxTFackwwN7goksA@containers-us-west-40.railway.app:6460')
+    redis = aioredis.Redis().from_url('redis://default:4ZxLzxTFackwwN7goksA@containers-us-west-40.railway.app:6460')
     # redis
 
 

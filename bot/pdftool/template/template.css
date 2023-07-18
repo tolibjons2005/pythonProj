@@ -225,7 +225,8 @@ margin-right:70px;
 .channel_link_img{
 
 }
-.imj{ clear: both; width:250px;}
+.small .imj{ clear: both; width:250px;}
+.large .imj{ clear: both; width:500px;}
 
 .nameClass{
 margin-top: 80px;

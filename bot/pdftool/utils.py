@@ -1,6 +1,6 @@
 import os
 import shutil
-import fitz
+
 import pdfkit
 import jinja2
 import PyPDF2
@@ -140,7 +140,7 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
             
 """
         context['functions'] = func_string
-        context['tests'] = tests
+        context['tests'] = tests.replace('\\frac','\\dfrac')
         context['name_s'] = name_s
 
         context['date'] = date
@@ -152,18 +152,23 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
     else:
         rown = False
         rown2 = False
-        if second_sub in ['Kimyo']:
+        if second_sub in ['Kimyo', 'Matematika','Fizika']:
             row_2 = 1
             rown = True
+            for_second_html='large'
         else:
             row_2=2
+            for_second_html = 'small'
 
 
-        if third_sub in ['Kimyo']:
+
+        if third_sub in ['Kimyo', 'Matematika','Fizika']:
             row_3=1
             rown2 = True
+            for_third_html = 'large'
         else:
             row_3=2
+            for_third_html = 'small'
 
 
 
@@ -341,8 +346,8 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
 
             tests += f"""
             <div id="newsletterContent1{i}">{text[0]}</div>
-            <div id="test2{i}">{text[1]}</div>
-            <div id="test3{i}">{text[2]}</div>
+            <div id="test2{i}" class="{for_second_html}">{text[1]}</div>
+            <div id="test3{i}" class="{for_third_html}">{text[2]}</div>
                         """
 
         template = template_env.get_template('./pdftool/template/template.html')
@@ -356,9 +361,9 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
 
         context['date']=date
 
-        context['tests'] = tests
+        context['tests'] = tests.replace('\\frac', '\\dfrac')
         p_height = '1189px'
-        delay= 1500*len(ids)
+        delay= 2500*len(ids)
 
 
 

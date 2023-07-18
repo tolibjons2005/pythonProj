@@ -1,6 +1,6 @@
 import asyncio
 import re
-from typing import Union
+
 
 from aiogram import types
 from aiogram.filters import CommandObject
@@ -26,7 +26,7 @@ from aiogram import Bot
 
 from openpyxl import Workbook
 
-from db.user import get_online_stats,register_student_fof,can_i_use,get_answers_oo,get_schname_tsub, wr_starter_db,is_group_active,premium_checker,get_expired_users,expire_date,create_user, get_st_ids, get_st_datas, add_answers, get_group_names, add_score, get_st_scores, \
+from db.user import change_is_used,is_used_checker,get_online_stats,register_student_fof,can_i_use,get_answers_oo,get_schname_tsub, wr_starter_db,is_group_active,premium_checker,get_expired_users,expire_date,create_user, get_st_ids, get_st_datas, add_answers, get_group_names, add_score, get_st_scores, \
      get_st_dats, get_ans_message, get_sub_names, get_t_sub, count_students, delete_student_r, add_to_dict, is_registered
 
 from pdftool.utils import create_pdf
@@ -45,15 +45,24 @@ d1 = today.strftime("%d.%m.%Y")
 
 # async def send_mes(message: types.Message,bot: Bot):
 #     await bot.send_message(1357099819,"Hello")
-
+async def upload_photo(message: types.Message):
+    await message.answer(message.photo[-1].file_id)
+    await message.answer_photo(message.photo[-1].file_id)
 async def get_ststs_on(message:types.Message, session_maker:sessionmaker, bot:Bot):
     res=await get_online_stats(message.from_user.id, session_maker)
     if res == 2:
-        await message.answer('Natijalar topilmadi')
+        await message.answer('Natijalar topilmadi. Hali bironta ham natija tekshirilmagan yoki onlayn test yaratilmagan.')
     elif res == 1:
+        await message.answer(
+            'Siz bepul tarifdasiz! Shu sababli Premium tarif rasmiylashtirmaguningizgacha onlayn test natijasini ola olmaysiz.\n\n'
+            'Premium tarif rasmiylashtirganingizdan so‘ng siz imkoniyatlaringizni ikki barobar ko‘paytirasiz, ya\'ni 4 tagacha guruh, har bir guruhga 30 tagacha odam qo‘shish, <b>onlayn test o‘tkazish</b> imkoniyatiga ega bo‘lasiz '
+            'va <b>eng asosiysi loyihani davom etishi va siz uchun yangidan-yangi imkoniyatlar yaratishimiz uchun katta yordam berasiz</b>\n\n'
+            '<i>Quyida tarifni tanlab, Click to‘lov tizimi orqali to‘lovni amalga oshirishingiz</i>',
+            parse_mode="HTML"
+        )
         await bot.send_invoice(
             chat_id=message.from_user.id,
-            title='Premiumni sotib olish',
+            title='30 kunlik Premiumni sotib olish',
             description='Premiumni rasmiylashtirish uchun karta ma\'lumotlaringizni kiriting ',
             payload='premium30',
             provider_token='398062629:TEST:999999999_F91D8F69C042267444B74CC0B3C747757EB0E065',
@@ -67,6 +76,22 @@ async def get_ststs_on(message:types.Message, session_maker:sessionmaker, bot:Bo
             need_name=True
 
         )
+        await bot.send_invoice(
+            chat_id=message.from_user.id,
+            title='1 kunlik Premiumni sotib olish',
+            description='Premiumni rasmiylashtirish uchun karta ma\'lumotlaringizni kiriting ',
+            payload='premium1',
+            provider_token='398062629:TEST:999999999_F91D8F69C042267444B74CC0B3C747757EB0E065',
+            currency='UZS',
+            prices=[
+                types.LabeledPrice(
+                    label="Premium tarifi",
+                    amount=500000
+                )
+            ],
+            need_name=True
+
+        )
     else:
 
 
@@ -75,6 +100,12 @@ async def get_ststs_on(message:types.Message, session_maker:sessionmaker, bot:Bo
 
         # Access the active sheet
         sheet = workbook.active
+
+
+        # Set the width of column A to 20 characters
+        sheet.column_dimensions['A'].width = 25
+        sheet.column_dimensions['B'].width = 20
+        sheet.column_dimensions['C'].width = 30
         sheet['A1'] = 'O‘quvchi ism-familiyasi'
         sheet['B1'] = 'To‘plagan bali'
         sheet['C1'] = 'Tekshirgan vaqti'
@@ -89,6 +120,8 @@ async def get_ststs_on(message:types.Message, session_maker:sessionmaker, bot:Bo
 
 
 
+
+
         # Save the workbook as bytes
         bytes_io = BytesIO()
         workbook.save(bytes_io)
@@ -97,11 +130,94 @@ async def get_ststs_on(message:types.Message, session_maker:sessionmaker, bot:Bo
         await bot.send_document(message.chat.id, document=document)
 
 
-async def create_ot(message: types.Message, state:FSMContext):
-    await message.answer('Qancha vaqt ichida sizning testingizni tekshirish mumkin?\n\n<i>Soatni faqat raqamlarda kiriting, '
-                         'agar 1 soatdan kam vaqtni ichida tekshirish mumkin bo‘lsa 0 ni yuboring</i>', parse_mode="HTML")
-    await state.update_data(expire_date=[])
-    await state.set_state(PostRegistration.set_hour)
+async def create_ot(message: types.Message, state:FSMContext, session_maker: sessionmaker):
+    is_premium = await premium_checker(message.from_user.id, session_maker)
+    is_used=await is_used_checker(message.from_user.id, session_maker)
+    if not is_used and not is_premium:
+        await message.answer(
+                               'Siz bepul tarifdasiz! Shu sababli Premium tarif rasmiylashtirmaguningizgacha bot yordamida onlayn test ola olmaysiz.\n\n'
+                               'Premium tarif rasmiylashtirganingizdan so‘ng siz imkoniyatlaringizni ikki barobar ko‘paytirasiz, ya\'ni 4 tagacha guruh, har bir guruhga 30 tagacha odam qo‘shish, <b>onlayn test o‘tkazish</b> imkoniyatiga ega bo‘lasiz '
+                               'va <b>eng asosiysi loyihani davom etishi va siz uchun yangidan-yangi imkoniyatlar yaratishimiz uchun katta yordam berasiz</b>\n\n'
+                               '<i>Quyida tarifni tanlab, Click to‘lov tizimi orqali to‘lovni amalga oshirishingiz yoki onlayn testni bepul olish uchun bir marta beriladigan imkoniyatdan foydalanishingiz mumkin</i>',
+                               parse_mode="HTML"
+                               )
+        await message.answer_invoice(
+
+            title='30 kunlik Premiumni sotib olish',
+            description='Premiumni rasmiylashtirish uchun karta ma\'lumotlaringizni kiriting ',
+            payload='premium30',
+            provider_token='398062629:TEST:999999999_F91D8F69C042267444B74CC0B3C747757EB0E065',
+            currency='UZS',
+            prices=[
+                types.LabeledPrice(
+                    label="Premium tarifi",
+                    amount=2000000
+                )
+            ],
+            need_name=True)
+        await message.answer_invoice(
+
+            title='1 kunlik Premiumni sotib olish',
+            description='Premiumni rasmiylashtirish uchun karta ma\'lumotlaringizni kiriting ',
+            payload='premium1',
+            provider_token='398062629:TEST:999999999_F91D8F69C042267444B74CC0B3C747757EB0E065',
+            currency='UZS',
+            prices=[
+                types.LabeledPrice(
+                    label="Premium tarifi",
+                    amount=500000
+                )
+            ],
+            need_name=True)
+        await message.answer(
+            'Agar onlayn testni bepul olish imkoniyatidan foydalanmoqchi bo‘lsangiz qancha vaqt ichida sizning testingizni tekshirish mumkinligini yozing?\n\n<i>Soatni faqat raqamlarda kiriting, '
+            'agar 1 soatdan kam vaqtni ichida tekshirish mumkin bo‘lsa 0 ni yuboring</i>', parse_mode="HTML")
+        await state.update_data(expire_date=[])
+        await state.set_state(PostRegistration.set_hour)
+    elif is_premium:
+        await message.answer(
+            'Qancha vaqt ichida sizning testingizni tekshirish mumkin?\n\n<i>Soatni faqat raqamlarda kiriting, '
+            'agar 1 soatdan kam vaqtni ichida tekshirish mumkin bo‘lsa 0 ni yuboring</i>', parse_mode="HTML")
+        await state.update_data(expire_date=[])
+        await state.set_state(PostRegistration.set_hour)
+    elif is_used:
+        await message.answer(
+            'Siz onlayn testni bepul olish uchun bir marta beriladigan imkoniyatdan foydalanib  bo‘lgansiz! Shu sababli Premium tarif rasmiylashtirmaguningizgacha bot yordamida onlayn test ola olmaysiz.\n\n'
+            'Premium tarif rasmiylashtirganingizdan so‘ng siz imkoniyatlaringizni ikki barobar ko‘paytirasiz, ya\'ni 4 tagacha guruh, har bir guruhga 30 tagacha odam qo‘shish, <b>onlayn test o‘tkazish</b> imkoniyatiga ega bo‘lasiz '
+            'va <b>eng asosiysi loyihani davom etishi va siz uchun yangidan-yangi imkoniyatlar yaratishimiz uchun katta yordam berasiz</b>\n\n'
+            '<i>Quyida kerakli tarifni tanlab, Click to‘lov tizimi orqali to‘lovni amalga oshirishingiz mumkin</i>',
+            parse_mode="HTML"
+        )
+        await message.answer_invoice(
+
+            title='30 kunlik Premiumni sotib olish',
+            description='Premiumni rasmiylashtirish uchun karta ma\'lumotlaringizni kiriting ',
+            payload='premium30',
+            provider_token='398062629:TEST:999999999_F91D8F69C042267444B74CC0B3C747757EB0E065',
+            currency='UZS',
+            prices=[
+                types.LabeledPrice(
+                    label="Premium tarifi",
+                    amount=2000000
+                )
+            ],
+            need_name=True)
+        await message.answer_invoice(
+
+            title='1 kunlik Premiumni sotib olish',
+            description='Premiumni rasmiylashtirish uchun karta ma\'lumotlaringizni kiriting ',
+            payload='premium1',
+            provider_token='398062629:TEST:999999999_F91D8F69C042267444B74CC0B3C747757EB0E065',
+            currency='UZS',
+            prices=[
+                types.LabeledPrice(
+                    label="Premium tarifi",
+                    amount=500000
+                )
+            ],
+            need_name=True)
+
+  
 async def enter_minute(message:types.Message, state:FSMContext):
     pattern = '^\d$|^\d\d$'
     result= re.match(pattern,message.text)
@@ -135,7 +251,7 @@ async def enter_channel_link(message:types.Message, state:FSMContext):
         await message.answer(
             'Daqiqa xato kiritildi.\n\n<i>Daqiqani faqat raqamlarda qaytadan kiriting</i>',
             parse_mode="HTML")
-async def select_on_test_type(message:Union[types.Message,types.CallbackQuery], state:FSMContext):
+async def select_on_test_type(message:types.Message|types.CallbackQuery, state:FSMContext):
     # try:
     pattern = '^(t\.me\/)....+'
     result = re.match(pattern, message.text)
@@ -192,9 +308,9 @@ async def get_file_on(message: types.Message, state: FSMContext, bot: Bot, sessi
 
     expire_date = user_data['expire_date']
     if test_type=='90':
-        second_sub = user_data['subject_1']
+        second_sub = user_data['subject_1'].replace('_', ' ')
 
-        third_sub = user_data['subject_2']
+        third_sub = user_data['subject_2'].replace('_', ' ')
         print(second_sub, third_sub)
         channel_link = user_data['channel_link']
 
@@ -211,12 +327,17 @@ async def get_file_on(message: types.Message, state: FSMContext, bot: Bot, sessi
         document = types.input_file.BufferedInputFile(file=save_to_title_pdf, filename='@ce_test_center_bot.pdf')
         await bot.send_document(message.chat.id, document=document)
         try:
-            save_to_pdf = await create_pdf_on(save_to_io, test_type, second_sub, third_sub, expire_date, d1,
+            save_to_pdf, epd = await create_pdf_on(save_to_io, test_type, second_sub, third_sub, expire_date, d1,
                                               message.from_user.id, session_maker, None, channel_link,
                                               datas.school_name)
+            if epd:
+                expire_date_text= f'⏰Testni tekshirish yakunlanadigan vaqt:\n<code>{epd}</code>'
+            else:
+                expire_date_text = f'⏰Testni tekshirish yakunlanadigan vaqt:\n<code>Belgilanmagan</code>'
             document = types.input_file.BufferedInputFile(file=save_to_pdf, filename='@ce_test_center_bot.pdf')
-            await bot.send_document(message.chat.id, document=document)
-            await message.answer(f'Test tekshirish kodi {message.from_user.id}')
+            await bot.send_document(message.chat.id, document=document, caption=f'📕Birinchi mutaxasislik fani:\n<code>{second_sub}</code>\n\n📗Ikkinchi mutaxasislik fani:\n<code>{third_sub}</code>\n\n🔑Test tekshirish kodi:\n<code>90{message.from_user.id}</code>\n\n{expire_date_text}\n\n📣Muallif kanali:\n{channel_link}')
+            await change_is_used(message.from_user.id, session_maker)
+
 
 
         except IndexError as e:
@@ -241,18 +362,27 @@ async def get_file_on(message: types.Message, state: FSMContext, bot: Bot, sessi
         document = types.input_file.BufferedInputFile(file=save_to_title_pdf, filename='@ce_test_center_bot.pdf')
         await bot.send_document(message.chat.id, document=document)
         try:
-            save_to_pdf = await create_pdf_on(save_to_io, test_type, None, None, expire_date, d1,
+            save_to_pdf,epd = await create_pdf_on(save_to_io, test_type, None, None, expire_date, d1,
                                               message.from_user.id, session_maker, datas.teacher_subject, channel_link,
                                               datas.school_name)
+            if epd:
+                expire_date_text = f'⏰Testni tekshirish yakunlanadigan vaqt:\n<code>{epd}</code>'
+            else:
+                expire_date_text = f'⏰Testni tekshirish yakunlanadigan vaqt:\n<code>Belgilanmagan</code>'
+
             document = types.input_file.BufferedInputFile(file=save_to_pdf, filename='@ce_test_center_bot.pdf')
-            await bot.send_document(message.chat.id, document=document)
-            await message.answer(f'Test tekshirish kodi {message.from_user.id}')
+            await bot.send_document(message.chat.id, document=document,
+                                    caption=f'Fan nomi:\n<code>{datas.teacher_subject}</code>\n\n🔑Test tekshirish kodi:\n<code>30{message.from_user.id}</code>\n\n{expire_date_text}\n\n📣Muallif kanali:\n{channel_link}')
+            await change_is_used(message.from_user.id, session_maker)
+
+
 
 
         except IndexError as e:
             await bot.send_message(message.chat.id,
                                    f"Jo'natilgan faylda testlar soni {test_type}tadan kam, yoki testlar xato kiritilgan")
             print(e)
+
 
 
 
@@ -447,7 +577,7 @@ async def check_inline_response(call: types.CallbackQuery, callback_data: Choose
     for i in range(questions):
         anw_message += f"\n{symb[i]}  {symb[i + questions]}  {symb[i + questions * 2]}"
     datNow = datetime.datetime.now()
-    await add_to_dict(int(test_code[2:]), call.from_user.id, str(resultg) + '%'+fullname+ '%'+datNow, session_maker)
+    await add_to_dict(int(test_code[2:]), call.from_user.id, str(resultg) + '%'+fullname+ '%'+str(datNow), session_maker)
 
 
 
@@ -457,7 +587,7 @@ async def check_inline_response(call: types.CallbackQuery, callback_data: Choose
 
     await state.set_state(Registration.show_res)
 
-async def student_menu(messag: Union[types.Message,types.CallbackQuery], state: FSMContext,bot: Bot, id: int = None):
+async def student_menu(messag: types.Message|types.CallbackQuery, state: FSMContext,bot: Bot, id: int = None):
 
     if not id:
         await messag.answer("O‘zingizga kerakli bo‘lgan menyuni tanlang", reply_markup=student_key)
@@ -474,21 +604,25 @@ async def select_sub_name(message: types.Message,state: FSMContext,session_maker
     if sub_names != []:
         builder = InlineKeyboardBuilder()
         for i in sub_names:
-            builder.add(types.InlineKeyboardButton(text=i, callback_data=f'sub_{i}'))
+            builder.add(types.InlineKeyboardButton(text=i.t_fullname, callback_data=f'sub_{i.teacher_id}'))
+            print(i.teacher_id)
         builder.adjust(1)
+
         await message.answer("Qaysi ustoz olgan test natijasini ko‘rishni istaysiz?",reply_markup=builder.as_markup())
     else:
         await message.answer('Siz hech qaysi guruhga qo‘shilmagansiz. Guruhga qo‘shilish uchun ustozingizga xabar bering. Ustozingiz ro‘yxatdan o‘tgan bo‘lsa, asosiy menyudan\n"Ma\'lumotlarni tahrirlash✏️"->"O‘quvchi qo‘shish➕" orqali sizni guruhga qo‘shishi, '
                              'agar ro‘yxatdan o‘tmagan bo‘lsa, ro‘yxatdan o‘tish davomida sizni guruhga qo‘shishi mumkin, quyida bu bo‘yicha qo‘llanmani ko‘rsatishingiz mumkin')
         await student_menu(message, state, bot)
 async def result_msg(call: types.CallbackQuery, state: FSMContext,bot:Bot, session_maker: sessionmaker):
+
     result = await get_ans_message(call.from_user.id,call.data[4:], session_maker)
+    print(result)
     await call.message.answer(result.replace('%^', "\n"), parse_mode="HTML")
     await student_menu(call, state, bot, call.from_user.id)
 async def tutorial(message: types.Message, state: FSMContext, session_maker: sessionmaker):
     await wr_starter_db(message.from_user.id, session_maker, message.from_user.full_name, message.from_user.username)
 
-    await message.answer(f"Assalomu alaykum, {message.from_user.full_name}, boshlashdan oldin iltimos qo‘llanma bilan yaxshilab tanishib chiqing", reply_markup=clear, parse_mode="HTML")
+    await message.answer(f"Assalomu alaykum, {message.from_user.full_name}, boshlashdan oldin iltimos qo‘llanma bilan yaxshilab tanishib chiqing", reply_markup=clear)
     await state.set_state(Registration.tutorial)
     #await state.set_state(PostRegistration.menu)
 
@@ -630,7 +764,7 @@ async def register_group_name(call: types.CallbackQuery,state: FSMContext):
         reply_markup=await back('20-02'))
     await state.set_state(Registration.register_group_name)
 
-async def register_new_group_name(message: Union[types.Message,types.CallbackQuery], state: FSMContext, session_maker: sessionmaker, bot: Bot) :
+async def register_new_group_name(message: types.Message|types.CallbackQuery, state: FSMContext, session_maker: sessionmaker, bot: Bot) :
 
 
     try:
@@ -641,13 +775,13 @@ async def register_new_group_name(message: Union[types.Message,types.CallbackQue
     is_premium = await premium_checker(uid, session_maker)
     if len(groups)==2 and is_premium == False:
         await bot.send_message(uid,'Siz bepul tarifdasiz! Shu sababli Premium tarif rasmiylashtirmaguningizgacha 2 tadan ko‘p guruh qo‘sha olmaysiz.\n\n'
-                                   'Premium tarif rasmiylashtirganingizdan so‘ng siz imkoniyatlaringizni ikki barobar ko‘paytirasiz, ya\'ni 4 tagacha guruh, har bir guruhga 30 tagacha odam qo‘shish imkoniyatiga ega bo‘lasiz '
+                                   'Premium tarif rasmiylashtirganingizdan so‘ng siz imkoniyatlaringizni ikki barobar ko‘paytirasiz, ya\'ni 4 tagacha guruh, har bir guruhga 30 tagacha odam qo‘shish, <b>onlayn test o‘tkazish</b> imkoniyatiga ega bo‘lasiz '
                                    'va <b>eng asosiysi loyihani davom etishi va siz uchun yangidan-yangi imkoniyatlar yaratishimiz uchun katta yordam berasiz</b>\n\n'
-                                   '<i>Quyida Click to‘lov tizimi orqali to‘lovni amalga oshirishingiz mumkin</i>' , parse_mode="HTML"
+                                   '<i>Quyida kerakli tarifni tanlab, Click to‘lov tizimi orqali to‘lovni amalga oshirishingiz mumkin</i>' , parse_mode="HTML"
                                   )
         await bot.send_invoice(
             chat_id=uid,
-            title='Premiumni sotib olish',
+            title='30 kunlik Premiumni sotib olish',
             description='Premiumni rasmiylashtirish uchun karta ma\'lumotlaringizni kiriting ',
             payload='premium30',
             provider_token='398062629:TEST:999999999_F91D8F69C042267444B74CC0B3C747757EB0E065',
@@ -714,7 +848,7 @@ async def detect_subject(message: types.Message,state: FSMContext, bot: Bot):
 
 
 
-async def new_detect_subject(message: Union[types.Message,types.CallbackQuery],state: FSMContext, bot: Bot, session_maker: sessionmaker):
+async def new_detect_subject(message: types.Message|types.CallbackQuery,state: FSMContext, bot: Bot, session_maker: sessionmaker):
     user_data = await state.get_data()
     t_subject = user_data['t_subject']
 
@@ -899,7 +1033,7 @@ async def register_students(message: types.Message, state: FSMContext, session_m
 
     elif message.forward_from and len(students_name)>=(15-len(cou)) and is_premium == False:
         await message.answer_invoice(
-            title='Premiumni sotib olish',
+            title='30 kunlik Premiumni sotib olish',
             description='Premiumni rasmiylashtirish uchun karta ma\'lumotlaringizni kiriting ',
             payload='premium30',
             provider_token='398062629:TEST:999999999_F91D8F69C042267444B74CC0B3C747757EB0E065',
@@ -908,6 +1042,21 @@ async def register_students(message: types.Message, state: FSMContext, session_m
                 types.LabeledPrice(
                     label="30 kunlik Premium tarifi",
                     amount=2000000
+                )
+            ],
+            need_name=True
+
+        )
+        await message.answer_invoice(
+            title='1 kunlik Premiumni sotib olish',
+            description='Premiumni rasmiylashtirish uchun karta ma\'lumotlaringizni kiriting ',
+            payload='premium1',
+            provider_token='398062629:TEST:999999999_F91D8F69C042267444B74CC0B3C747757EB0E065',
+            currency='UZS',
+            prices=[
+                types.LabeledPrice(
+                    label="1 kunlik Premium tarifi",
+                    amount=500000
                 )
             ],
             need_name=True
@@ -953,12 +1102,21 @@ async def pre_checkout_query(pre_checkout_query: types.PreCheckoutQuery, bot: Bo
 async def successful_payment(message: types.Message,state: FSMContext, session_maker: sessionmaker, bot: Bot):
     if message.successful_payment.invoice_payload == 'premium30':
 
-        expire_dat=await expire_date(message.from_user.id, session_maker)
+        expire_dat=await expire_date(message.from_user.id, 30,session_maker)
 
-        msg=await message.answer(f'Muvaffaqiyatli to‘lov qilindi! Endi 30 kun davomida 30 tagacha o‘quvchidan iborat 4 tagacha guruh bilan ishlashingiz mumkin. Bizni qo‘llab-quvvatlaganingiz uchun rahmat❤️\n\nAgar guruh nomini kiritayotganingizda yoki o‘quvchi habarini jo‘natayotgan paytingiz to‘lovni amalga oshirgan b'
+        msg=await message.answer(f'Muvaffaqiyatli to‘lov qilindi! Endi 30 kun davomida 30 tagacha o‘quvchidan iborat 4 tagacha guruh bilan ishlashingiz va bot yordamida onlayn test o‘tkazishingiz mumkin. Bizni qo‘llab-quvvatlaganingiz uchun rahmat❤️\n\nAgar guruh nomini kiritayotganingizda yoki o‘quvchi habarini jo‘natayotgan paytingiz to‘lovni amalga oshirgan '
                              f'bo‘lsangiz, iltimos, guruh nomini qaytadan yozing yoki o‘quchi habarini qaytadan jo‘nating.\n\n'
                              f'Agar guruh tanlayotganingizda to‘lagan bo‘lsangiz, iltimos,  "Qaytadan tanlash🔁" tugmasini bosib shu guruhni qaytadan tanlang.\n\n\n'
-                             f'<b>Premium obunani amal qilish muddati:</b> <code>{expire_dat}</code>', parse_mode="HTML")
+                             f'<b>Premium obunani amal qilish muddati:</b> \n<code>{expire_dat}</code>', parse_mode="HTML")
+        await bot.pin_chat_message(message.from_user.id, msg.message_id)
+    elif message.successful_payment.invoice_payload == 'premium1':
+        expire_dat = await expire_date(message.from_user.id, 1, session_maker)
+
+        msg = await message.answer(
+            f'Muvaffaqiyatli to‘lov qilindi! Endi 1 kun davomida 30 tagacha o‘quvchidan iborat 4 tagacha guruh bilan ishlashingiz va bot yordamida onlayn test o‘tkazishingiz mumkin. Bizni qo‘llab-quvvatlaganingiz uchun rahmat❤️\n\nAgar guruh nomini kiritayotganingizda yoki o‘quvchi habarini jo‘natayotgan paytingiz to‘lovni amalga oshirgan '
+            f'bo‘lsangiz, iltimos, guruh nomini qaytadan yozing yoki o‘quchi habarini qaytadan jo‘nating.\n\n'
+            f'Agar guruh tanlayotganingizda to‘lagan bo‘lsangiz, iltimos,  "Qaytadan tanlash🔁" tugmasini bosib shu guruhni qaytadan tanlang.\n\n\n'
+            f'<b>Premium obunani amal qilish muddati:</b> \n<code>{expire_dat}</code>', parse_mode="HTML")
         await bot.pin_chat_message(message.from_user.id, msg.message_id)
 
 
@@ -971,14 +1129,14 @@ async def remove_from_premium(message: types.Message, session_maker: sessionmake
             msg=await bot.send_message(np, 'Afsuski, Premium tarifi muddatingiz yakunlandi. 2 ta guruhdagi 15 tadan tashqari barcha o‘quvchilar ma\'lumotlari inaktiv holatga o‘tadi va ulardan foydalana olmaysiz. '
                                        f'O‘quvchilar ma\'lumotlarini aktiv holatga o‘tkazib undan foydalanish uchun yana Premium tarifini faollashtirishingiz kerak. '
                 ' <b>Unutmang, Premiumni aktivlashtirib siz eng asosiysi loyihani davom etishi va siz uchun yangidan-yangi imkoniyatlar yaratishimiz uchun katta yordam bergan bo‘lasiz. Bizni qo‘llab-quvvatlayotganingiz uchun rahmat❤️</b>\n\n'
-                '<i>Quyida Click to‘lov tizimi orqali to‘lovni amalga oshirishingiz mumkin👇</i>',)
+                '<i>Quyida kerakli tarifni tanlab, Click to‘lov tizimi orqali to‘lovni amalga oshirishingiz mumkin👇</i>',)
 
 
 
 
 
 
-            await bot.send_invoice(np,title='Premiumni sotib olish',
+            await bot.send_invoice(np,title='30 kunlik Premiumni sotib olish',
                                               description='Premiumni rasmiylashtirish uchun karta ma\'lumotlaringizni kiriting ',
                                               payload='premium30',
                                               provider_token='398062629:TEST:999999999_F91D8F69C042267444B74CC0B3C747757EB0E065',
@@ -1043,11 +1201,11 @@ async def get_file(message: types.Message, state: FSMContext, bot: Bot, session_
     ids = await get_st_ids(int(message.from_user.id),groupn, session_maker)
     datas = await get_st_datas(int(message.from_user.id), groupn,session_maker)
     save_to_title_pdf=await create_title(ids, message.from_user.id, datas.school_name, d1, groupn,
-                 datas.subject_1, datas.subject_2,test_type, session_maker, datas.teacher_subject)
+                 datas.subject_1.replace('_', ' '), datas.subject_2.replace('_', ' '),test_type, session_maker, datas.teacher_subject)
     document = types.input_file.BufferedInputFile(file=save_to_title_pdf, filename='@ce_test_center_bot.pdf')
     await bot.send_document(message.chat.id, document=document)
     try:
-        save_to_pdf, cvl,ivl = await create_pdf(save_to_io, test_type, datas.subject_1, datas.subject_2, datas.school_name, ids,
+        save_to_pdf, cvl,ivl = await create_pdf(save_to_io, test_type, datas.subject_1.replace('_', ' '), datas.subject_2.replace('_', ' '), datas.school_name, ids,
                                        d1, message.from_user.id, session_maker, datas.teacher_subject, book_type)
         document = types.input_file.BufferedInputFile(file=save_to_pdf, filename='@ce_test_center_bot.pdf')
         await bot.send_document(message.chat.id, document=document)
@@ -1115,11 +1273,11 @@ async def select_test_type(call: types.CallbackQuery, state: FSMContext, session
         await call.message.edit_text(f'{call.data[3:]} ushbu guruh Premium tarifi muddati tugagani uchun inaktiv holatga o‘tkazilgan.\n\n'
                                      f' Guruhni aktiv holatga o‘tkazib undan foydalanish  uchun yana Premium tarifini faollashtirishingiz kerak. '
                                      ' <b>Unutmang, Premiumni aktivlashtirib siz eng asosiysi loyihani davom etishi va siz uchun yangidan-yangi imkoniyatlar yaratishimiz uchun katta yordam bergan bo‘lasiz. Bizni qo‘llab-quvvatlayotganingiz uchun rahmat❤️</b>\n\n'
-                                     '<i>Quyida Click to‘lov tizimi orqali to‘lovni amalga oshirishingiz mumkin👇</i>',
+                                     '<i>Quyida kerakli tarifni tanlab, Click to‘lov tizimi orqali to‘lovni amalga oshirishingiz mumkin👇</i>',
                                      parse_mode="HTML"
                                      )
 
-        await call.message.answer_invoice(title='Premiumni sotib olish',
+        await call.message.answer_invoice(title='30 kunlik Premiumni sotib olish',
             description='Premiumni rasmiylashtirish uchun karta ma\'lumotlaringizni kiriting ',
             payload='premium30',
             provider_token='398062629:TEST:999999999_F91D8F69C042267444B74CC0B3C747757EB0E065',
@@ -1139,9 +1297,9 @@ async def select_test_type(call: types.CallbackQuery, state: FSMContext, session
 async def select_book_type(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(test_type=call.data[-2:])
     if call.data[-2:] == '90':
-        await call.message.edit_text('Test kitobchasi shaklini tanlang:', reply_markup=k_select_book_type,  cache_time=1)
+        await call.message.answer_photo('AgACAgIAAxkBAAIx1mSz0U8RFOh8t3f6E5L55Jti9u00AAIB4TEb92WgSfJBToXLfEjCAQADAgADeQADLwQ',caption='Test kitobchasi shaklini tanlang:', reply_markup=k_select_book_type,  cache_time=1)
     else:
-        await call.message.edit_text('Test kitobchasi shaklini tanlang:', reply_markup=k_select_book_type30,  cache_time=1)
+        await call.message.answer_photo('AgACAgIAAxkBAAIx1mSz0U8RFOh8t3f6E5L55Jti9u00AAIB4TEb92WgSfJBToXLfEjCAQADAgADeQADLwQ',caption='Test kitobchasi shaklini tanlang:', reply_markup=k_select_book_type30,  cache_time=1)
 async def send_file(call: types.CallbackQuery, state: FSMContext):
     await call.message.answer("Testni <a href=\"https://t.me/namuna_kana/2\">namunada</a> ko‘rsatilganidek shaklda jo‘nating va uyog‘ini bizga qo‘yib bering😊", reply_markup=back_2_menu,  cache_time=1, parse_mode="HTML", disable_web_page_preview=True)
     await state.set_state(PostRegistration.send_file)
@@ -1225,11 +1383,11 @@ async def edit_add_students(call: types.CallbackQuery, state: FSMContext, sessio
             f'{call.data[3:]} ushbu guruh Premium tarifi muddati tugagani uchun inaktiv holatga o‘tkazilgan.\n\n'
             f' Guruhni aktiv holatga o‘tkazib undan foydalanish  uchun yana Premium tarifini faollashtirishingiz kerak. '
             ' <b>Unutmang, Premiumni aktivlashtirib siz eng asosiysi loyihani davom etishi va siz uchun yangidan-yangi imkoniyatlar yaratishimiz uchun katta yordam bergan bo‘lasiz. Bizni qo‘llab-quvvatlayotganingiz uchun rahmat❤️</b>\n\n'
-            '<i>Quyida Click to‘lov tizimi orqali to‘lovni amalga oshirishingiz mumkin👇</i>',
+            '<i>Quyida kerakli tarifni tanlab, Click to‘lov tizimi orqali to‘lovni amalga oshirishingiz mumkin👇</i>',
             parse_mode="HTML"
             )
 
-        await call.message.answer_invoice(title='Premiumni sotib olish',
+        await call.message.answer_invoice(title='30 kunlik Premiumni sotib olish',
                                           description='Premiumni rasmiylashtirish uchun karta ma\'lumotlaringizni kiriting ',
                                           payload='premium30',
                                           provider_token='398062629:TEST:999999999_F91D8F69C042267444B74CC0B3C747757EB0E065',

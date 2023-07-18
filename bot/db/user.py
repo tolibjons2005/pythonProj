@@ -72,6 +72,7 @@ class IsPremium(BaseModel):
 
 
 
+
     # upd_date = Column(DATE, onupdate=datetime.date.today())
 
     def __str__(self) -> str:
@@ -111,8 +112,17 @@ class DbForOnlineTest(BaseModel):
     subject_2 = Column(VARCHAR(28), nullable=True)
     expire_date = Column(DateTime, server_default=func.now(), index=True, nullable=True)
     data = Column(JSON, nullable=True)
+    def __str__(self) -> str:
+        return f"Users:{self.teacher_id}>"
 
 
+class IsUsedDB(BaseModel):
+    __tablename__ = 'isuseddb'
+    numer = Column(Integer, primary_key=True, autoincrement=True)
+
+
+    teacher_id = Column(BigInteger,  nullable=True)
+    is_used_online = Column(Boolean, default=False)
 
 
 
@@ -120,6 +130,38 @@ class DbForOnlineTest(BaseModel):
 
     def __str__(self) -> str:
         return f"Users:{self.teacher_id}>"
+
+async def change_is_used(teacher_id:int,session_maker:sessionmaker):
+    async with session_maker() as session:
+        async with session.begin():
+            await session.execute(update(IsUsedDB).values(
+                {'is_used_online': True}).where(
+                (IsUsedDB.teacher_id==teacher_id)))
+async def is_used_checker(teacher_id:int,session_maker:sessionmaker):
+    async with session_maker() as session:
+        async with session.begin():
+            users = await session.execute(
+                select(IsUsedDB.is_used_online).where(IsUsedDB.teacher_id == teacher_id))
+            teacher = users.scalars().first()
+            if teacher==None:
+                user = IsUsedDB(
+                    teacher_id=teacher_id,
+                    is_used_online=False
+
+                )
+                session.add(user)
+                return False
+            else:
+                return teacher
+
+
+
+
+
+
+
+
+
 
 
 async def get_online_stats(teacher_id:int,session_maker:sessionmaker):
@@ -244,6 +286,7 @@ async def add_to_ONLINE(teacher_id:int,answer:str, expire_date:list,session_make
                 epd=None
             else:
                 expd=datetime.datetime.now()+datetime.timedelta(hours=expire_date[0], minutes=expire_date[1])
+                epd=expd.strftime("%c")
 
             rest = await session.execute(
                 select(DbForOnlineTest).where(DbForOnlineTest.teacher_id == teacher_id))
@@ -344,29 +387,43 @@ async def premium_checker(user_id:int, session_maker: sessionmaker):
             if bl != None:
                 return True
             return False
-async def expire_date(teacher_id:int, session_maker:sessionmaker):
+async def expire_date(teacher_id:int, premium_type:int,session_maker:sessionmaker):
     async with session_maker() as session:
         async with session.begin():
-            expire_dat = datetime.datetime.now()+datetime.timedelta(minutes=1)
+
+            expire_dat = datetime.datetime.now()+datetime.timedelta(days=premium_type)
             rest = await session.execute(
                 select(IsPremium).where(IsPremium.teacher_id == teacher_id))
-            bl = rest.one_or_none()
+            bl = rest.scalars().first()
+
 
             if bl == None:
                 user = IsPremium(
 
                     teacher_id=teacher_id,
                     is_premium=True,
-                    expire_date=expire_dat
+                    expire_date=expire_dat,
+                    
 
                 )
 
                 session.add(user)
             else:
 
-                await session.execute(update(IsPremium).values({'expire_date':expire_dat,
-                                                           'is_premium':True}).where(
-                    IsPremium.teacher_id ==teacher_id))
+                if bl.is_premium:
+                    expire_dat=bl.expire_date + datetime.timedelta(days=premium_type)
+                    await session.execute(update(IsPremium).values({'expire_date': expire_dat,
+                                                                    'is_premium': True}).where(
+                        IsPremium.teacher_id == teacher_id))
+                elif not bl.is_premium:
+                    await session.execute(
+                        update(IsPremium).values({'expire_date': expire_dat,
+                                                  'is_premium': True}).where(
+                            IsPremium.teacher_id == teacher_id))
+
+
+
+
                 await session.execute(update(User).values({"is_active": True}).where(User.teacher_id == teacher_id))
             return expire_dat
 
@@ -391,6 +448,8 @@ async def get_expired_users(session_maker: sessionmaker):
             await session.execute(update(IsPremium).values({'expire_date': (datetime.datetime.now()+datetime.timedelta(days=365)),'is_premium': False}).where(IsPremium.expire_date<datNow))
             teachers_id=teachers_id.scalars().all()
             for tid in teachers_id:
+
+
                 result = await session.execute(
                     select(User.group_name).distinct()
                     .where(User.teacher_id == tid)  # type: ignore
@@ -405,14 +464,16 @@ async def get_expired_users(session_maker: sessionmaker):
                                                                                       r]).order_by(
                             User.numer.asc()).offset(15))
                         res = res.scalars().all()
-                        await session.execute(update(User).values({"is_active": False}).where(User.student_id.in_(res),
-                                                                                              User.group_name == result[
-                                                                                                  r]))
+                        await session.execute(
+                            update(User).values({"is_active": False}).where(User.student_id.in_(res),
+                                                                            User.group_name == result[
+                                                                                r]))
                     else:
                         print(r)
                         await session.execute(
                             update(User).values({"is_active": False}).where(User.teacher_id == tid,
                                                                             User.group_name == result[r]))
+
 
 
             return teachers_id
@@ -469,7 +530,7 @@ async def get_sub_names(user_id: int, session_maker: sessionmaker) -> User.stude
     async with session_maker() as session:
         async with session.begin():
             result = await session.execute(
-                select(User.t_fullname)
+                select(User)
                     .filter(User.student_id == user_id)  # type: ignore
             )
             return result.scalars().all()
@@ -547,6 +608,7 @@ async def create_user(student_id: int,teacher_id: int, st_fullname:str, t_fullna
                     n_test='00'
 
                 )
+
                 try:
                     session.add(user)
                 except SQLAlchemyError:
@@ -742,13 +804,13 @@ async def get_ans_message(user_id: int,subject:str, session_maker: sessionmaker)
         async with session.begin():
             result = await session.execute(
                 select(User.ans_message)
-                .filter(User.student_id == user_id, User.t_fullname == subject)  # type: ignore
+                .filter(User.student_id == user_id, User.teacher_id == int(subject))  # type: ignore
             )
             bl=result.scalars().first()
 
                 
             if bl != None:
-                return print(bl)
+                return bl
             else:
                 return "Hali bironta ham siz tomoningizdan ishlangan test tekshirilmagan"
 
