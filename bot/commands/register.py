@@ -399,13 +399,13 @@ async def check_online_test(message: types.Message, state: FSMContext,session_ma
     elif is_regisered==1:
         await message.answer(
             '😔Afsuski, sizga berilgan barcha imkoniyatdan foydalanib bo‘lgansiz. Botdan cheklovlarsiz foydalanish uchun ustozingizga xabar bering. Ustozingiz ro‘yxatdan o‘tgan bo‘lsa, asosiy menyudan\n"Ma\'lumotlarni tahrirlash✏️"->"O‘quvchi qo‘shish➕" orqali sizni guruhga qo‘shishi, '
-            'agar ro‘yxatdan o‘tmagan bo‘lsa, ro‘yxatdan o‘tish davomida sizni guruhga qo‘shishi mumkin, quyida bu bo‘yicha qo‘llanmani ko‘rsatishingiz mumkin\n\n'
+            'agar ro‘yxatdan o‘tmagan bo‘lsa, ro‘yxatdan o‘tish davomida sizni guruhga qo‘shishi mumkin, quyida bu bo‘yicha qo‘llanmani ko‘rsatishingiz mumkin\n\nhttps://telegra.ph/Card-ED-Test-Centerdan-royxatdan-otish-07-18'
 
         )
     else:
         await message.answer(
                              '😔Afsuski, siz hech qaysi guruhga qo‘shilmagansiz. Guruhga qo‘shilish uchun ustozingizga xabar bering. Ustozingiz ro‘yxatdan o‘tgan bo‘lsa, asosiy menyudan\n"Ma\'lumotlarni tahrirlash✏️"->"O‘quvchi qo‘shish➕" orqali sizni guruhga qo‘shishi, '
-                             'agar ro‘yxatdan o‘tmagan bo‘lsa, ro‘yxatdan o‘tish davomida sizni guruhga qo‘shishi mumkin, quyida bu bo‘yicha qo‘llanmani ko‘rsatishingiz mumkin\n\n'
+                             'agar ro‘yxatdan o‘tmagan bo‘lsa, ro‘yxatdan o‘tish davomida sizni guruhga qo‘shishi mumkin, quyida bu bo‘yicha qo‘llanmani ko‘rsatishingiz mumkin\nhttps://telegra.ph/Card-ED-Test-Centerdan-royxatdan-otish-07-18\n\n'
                              '<i>Xavotirlanmang, ustozingiz guruhga qo‘shgungacha siz ishlagan testingizni tekshirib turishingiz mumkin😉. Buning uchun ism-familiyangizni yozib jo‘nating.</i>'
                              )
         await state.set_state(StudentMenu.start_own_register)
@@ -611,7 +611,7 @@ async def select_sub_name(message: types.Message,state: FSMContext,session_maker
         await message.answer("Qaysi ustoz olgan test natijasini ko‘rishni istaysiz?",reply_markup=builder.as_markup())
     else:
         await message.answer('Siz hech qaysi guruhga qo‘shilmagansiz. Guruhga qo‘shilish uchun ustozingizga xabar bering. Ustozingiz ro‘yxatdan o‘tgan bo‘lsa, asosiy menyudan\n"Ma\'lumotlarni tahrirlash✏️"->"O‘quvchi qo‘shish➕" orqali sizni guruhga qo‘shishi, '
-                             'agar ro‘yxatdan o‘tmagan bo‘lsa, ro‘yxatdan o‘tish davomida sizni guruhga qo‘shishi mumkin, quyida bu bo‘yicha qo‘llanmani ko‘rsatishingiz mumkin')
+                             'agar ro‘yxatdan o‘tmagan bo‘lsa, ro‘yxatdan o‘tish davomida sizni guruhga qo‘shishi mumkin, quyida bu bo‘yicha qo‘llanmani ko‘rsatishingiz mumkin:\nhttps://telegra.ph/Card-ED-Test-Centerdan-royxatdan-otish-07-18')
         await student_menu(message, state, bot)
 async def result_msg(call: types.CallbackQuery, state: FSMContext,bot:Bot, session_maker: sessionmaker):
 
@@ -622,7 +622,7 @@ async def result_msg(call: types.CallbackQuery, state: FSMContext,bot:Bot, sessi
 async def tutorial(message: types.Message, state: FSMContext, session_maker: sessionmaker):
     await wr_starter_db(message.from_user.id, session_maker, message.from_user.full_name, message.from_user.username)
 
-    await message.answer(f"Assalomu alaykum, {message.from_user.full_name}, boshlashdan oldin iltimos qo‘llanma bilan yaxshilab tanishib chiqing", reply_markup=clear)
+    await message.answer(f"Assalomu alaykum, {message.from_user.full_name}, boshlashdan oldin iltimos qo‘llanma bilan yaxshilab tanishib chiqing: \n https://telegra.ph/Card-ED-Test-Centerdan-royxatdan-otish-07-18", reply_markup=clear)
     await state.set_state(Registration.tutorial)
     #await state.set_state(PostRegistration.menu)
 
