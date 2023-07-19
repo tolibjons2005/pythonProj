@@ -148,7 +148,7 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
 
         # template = template_env.get_template('./pdftool/template/templatecopy.html')
         # context['block1'] = get_string(output_file, test_type)
-        delay= 1500*len(ids)
+        delay= 2500*len(ids)
     else:
         rown = False
         rown2 = False
@@ -363,7 +363,7 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
 
         context['tests'] = tests.replace('\\frac', '\\dfrac')
         p_height = '1189px'
-        delay= 2500*len(ids)
+        delay= 5000*len(ids)
 
 
 
