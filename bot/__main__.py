@@ -37,7 +37,7 @@ async def main() -> None:
     #storage = MemoryStorage()
     dp =Dispatcher(storage=RedisStorage(redis=redis))
     bot = Bot(token=os.getenv('token'))
-    dp.message.middleware(ChatActionMiddleware())
+    #dp.message.middleware(ChatActionMiddleware())
 
 
     # dp.callback_query.middleware(RegisterCheck())

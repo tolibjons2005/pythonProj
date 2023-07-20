@@ -347,7 +347,7 @@ async def wr_starter_db(user_id:int, session_maker:sessionmaker,user_fullname=No
 
             rest = await session.execute(
                 select(StarterDB).where(StarterDB.user_id == user_id))
-            bl = rest.one_or_none()
+            bl = rest.scalars().first()
 
             if bl == None:
                 user = StarterDB(

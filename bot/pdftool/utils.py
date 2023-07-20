@@ -29,14 +29,14 @@ context = {
 }
 
 
-config = pdfkit.configuration(wkhtmltopdf=path_to_wkhtmltopdf)
+config = pdfkit.configuration()
 template_loader = jinja2.FileSystemLoader('./')
 template_env=jinja2.Environment(loader=template_loader)
 
 
 
 async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids, date, tid, session_maker, t_sub, book_type):
-    parent_dir = "D:/pythonProject/bot/img"
+    parent_dir = "/root/cardbot/pythonProject/bot/img"
     directory = f"id{tid}"
 
     # Path
@@ -385,7 +385,7 @@ async def create_pdf(output_file, test_type, second_sub, third_sub, name_s, ids,
         'no-outline': '',
         'disable-smart-shrinking': True,
         'enable-local-file-access': '',
-        'debug-javascript':'',
+        #'debug-javascript':'',
         #'no-stop-slow-scipts':''
         # 'disable-local-file-access': ''
 

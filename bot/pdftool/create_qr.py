@@ -9,7 +9,7 @@ def create_directory(name):
     directory = f"id{name}"
 
     # Parent Directories
-    parent_dir = "D:/pythonProject/bot/pdftool/qrcodes"
+    parent_dir = "/root/cardbot/pythonProject/bot/pdftool/qrcodes"
 
     # Path
     path = os.path.join(parent_dir, directory)
@@ -37,7 +37,7 @@ def create_qr_f(id, name, n, test_type):
     qr.make(fit=True)
 
     img = qr.make_image(fill_color='black', back_color='white')
-    img.save(f'D:/pythonProject/bot/pdftool/qrcodes/id{name}/id{id}.png')
+    img.save(f'/root/cardbot/pythonProject/bot/pdftool/qrcodes/id{name}/id{id}.png')
 
 async def create_qr_fo(id, test_type=None, channel_name=None):
     qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=15, border=0)
@@ -48,14 +48,14 @@ async def create_qr_fo(id, test_type=None, channel_name=None):
         qr.make(fit=True)
 
         img = qr.make_image(fill_color='black', back_color='white')
-        img.save(f'D:/pythonProject/bot/pdftool/qrcodes/channel_link/t_id{id}.png')
+        img.save(f'/root/cardbot/pythonProject/bot/pdftool/qrcodes/channel_link/t_id{id}.png')
     else:
 
         qr.add_data(channel_name)
         qr.make(fit=True)
 
         img = qr.make_image(fill_color='black', back_color='white')
-        img.save(f'D:/pythonProject/bot/pdftool/qrcodes/channel_link/id{id}.png')
+        img.save(f'/root/cardbot/pythonProject/bot/pdftool/qrcodes/channel_link/id{id}.png')
 # factory = qrcode.image.svg.SvgPathImage
 # svg_img = qrcode.make('SALOM', image_factory=factory)
 # svg_img.save('advanced.svg')

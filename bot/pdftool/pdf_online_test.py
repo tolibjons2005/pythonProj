@@ -29,13 +29,13 @@ context = {
     # 'block3':block3
 }
 
-config = pdfkit.configuration(wkhtmltopdf=path_to_wkhtmltopdf)
+config = pdfkit.configuration()
 template_loader = jinja2.FileSystemLoader('./')
 template_env = jinja2.Environment(loader=template_loader)
 
 
 async def create_pdf_on(output_file, test_type, second_sub, third_sub,expire_date, date, tid, session_maker, t_sub, channel_link,name_s):
-    parent_dir = "D:/pythonProject/bot/img"
+    parent_dir = "/root/cardbot/pythonProject/bot/img"
     directory = f"id{tid}"
 
     # Path
